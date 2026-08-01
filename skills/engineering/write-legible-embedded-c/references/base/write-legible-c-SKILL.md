@@ -1,14 +1,9 @@
 ---
 name: write-legible-c
 description: >
-  Apply a strict C11 and repository-legibility standard when creating,
-  modifying, refactoring, debugging, fixing, reviewing, or presenting C code.
-  Use for .c and .h files, C APIs and snippets, tests written in C, build-facing
-  C code, and agent-facing instructions or conventions for C repositories.
-  Triggers: /write-legible-c, write legible C, legible C, C standard, AGENTS.md
-  C rules, refactor C to standard, machine-legible C, C11 style, MODULE_TRY,
-  section-16 map_eat. Do not use for C++, Objective-C, or general prose-only C
-  questions that assess neither code nor a C repository.
+  Strict C11 machine-legibility for writing or reviewing .c/.h, C APIs,
+  C tests, and C-facing AGENTS.md. Triggers: /write-legible-c, legible C,
+  MODULE_TRY, near-miss map_eat. Use when another skill needs host C base.
 metadata:
   short-description: "Enforce legible C and repository standards"
 ---
@@ -20,19 +15,19 @@ reviewed, or presented.
 
 ## Load the standard
 
-Read [c-standard.md](c-standard.md) completely before reasoning about a C
-change. Treat it as the normative implementation and review checklist.
-# Vendored under write-legible-embedded-c/references/base/ (upstream: 7etsuo/write-legible-c).
-
-Use section 15 as the pattern for greenfield modules. Use section 16 as the
-default pattern for editing existing code: diagnose the near miss, make the
-smallest behavior-preserving decomposition, then decide whether the task's
-scope permits the fully conforming API stage.
-
-Use section 17 when assessing or changing a C repository's agent guidance,
-conventions, directory documentation, or test feedback loop. Use section 18
-to understand a rule's provenance, not as a substitute for repository-local
-evidence.
+1. Read [c-standard.md](c-standard.md) sections **1–14** before designing a C
+   change. Treat that file as the normative rule set and pre-delivery gate.
+2. Load disclosed material only when its branch fires:
+   - **Greenfield** module or new file that should show full layout →
+     [skeleton.md](skeleton.md)
+   - **Existing** function that already looks short and flat →
+     [near-miss-map-eat.md](near-miss-map-eat.md) (diagnose near miss, smallest
+     behavior-preserving decomposition, then decide whether scope allows the
+     fully conforming API stage)
+   - **Repository** agent guidance, `AGENTS.md`, directory docs, or test
+     feedback loop → [repository-level.md](repository-level.md)
+   - **Provenance** questions only (not a delivery gate) →
+     [PROVENANCE.md](PROVENANCE.md)
 
 If the workspace has a repo-root `AGENTS.md` that already embeds this standard
 (or a subset), treat repo `AGENTS.md` as higher-priority for that workspace,
@@ -48,33 +43,31 @@ and still use this skill's full checklist for any rule the repo file omits.
 3. Preserve behavior and compatibility unless the user requests a semantic
    change. Use adapters when an external API conflicts with the standard.
 4. Design the file-top vocabulary and function boundaries before editing
-   bodies. Classify every function as an orchestrator, leaf, or adapter, then
-   separately record whether it is a public boundary. Public visibility is
-   not a fourth function altitude. Keep each helper at one altitude and
-   require it to pass the name test in section 4 of the standard.
+   bodies. Classify every function as an **orchestrator**, **leaf**, or
+   **adapter**, then separately record whether it is a public boundary. Public
+   visibility is not a fourth function altitude. Keep each helper at one
+   altitude and require it to pass the **name test** in section 4 of the
+   standard.
 5. Implement the smallest coherent change. Apply the standard to every
    touched function and declaration, including test code written in C.
-6. Run the project's required build and tests, then apply every item in the
-   standard's pre-delivery checklist to the final diff. The checklist is a
-   final gate, not a substitute for auditing every section.
+6. Run the project's required build and tests, then apply **every item** in
+   [c-standard.md](c-standard.md) section **14** (pre-delivery checklist) to
+   the final diff. Section 14 is the single verification source of truth; do
+   not restate its items here.
+
+**Done when:** section 14 is fully applied to the final diff (or each forced
+deviation has a precise source-site comment).
 
 Treat the prose rules as authoritative when an example is incomplete. Apply
-the same gates to snippets and full files. Check declarations at their first
-valid value, the abbreviation allowlist, output-parameter order,
-internal-helper asserts, function classification, cognitive-complexity
-budget, loop bounds, recursion ban, dereference depth, function-pointer
-placement, and assertion density explicitly before delivery. Recheck every
-state-mutating leaf for a precondition or postcondition assert.
+the same gates to snippets and full files. For an existing function that
+already looks short and flat, complete the near-miss pass in
+[near-miss-map-eat.md](near-miss-map-eat.md) before accepting it—judge the
+refactor by the cost of the next change.
 
-For an existing function that already looks short and flat, run the section
-16 near-miss test before accepting it. Look for duplicated mutation, data
-encoded as control flow, interleaved concepts, and declarations placed before
-their first valid value. Judge the refactor by the cost of the next change.
-
-For repository-level work, keep instructions dense and evidence-based. Do
-not invent a path map that can be discovered from the tree, and do not change
-agent guidance or test policy unless the task authorizes repository-level
-changes.
+For repository-level work, follow [repository-level.md](repository-level.md):
+dense, evidence-based guidance only; do not invent a path map discoverable
+from the tree; do not change agent guidance or test policy unless the task
+authorizes repository-level changes.
 
 ## Resolve constraints
 

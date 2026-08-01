@@ -17,7 +17,7 @@ Which legibility regime applies:
 
 | Class | Regime |
 |-------|--------|
-| **ORCH** | Full Base Standard: 15 target / 40 hard, orchestrator/leaf/adapter, status enums, §14–§16. |
+| **ORCH** | Full Base Standard: 15 target / 40 hard, orchestrator/leaf/adapter, status enums, §14 gate; near-miss file when code already looks short/flat. |
 | **HOT** | [hot-rules.md](hot-rules.md) overrides Base line budgets and call pressure. Still limit nesting; prefer deferral. |
 | **BOUND** | Thin adapter over frozen foreign API (Vendor, SDK export, kernel uAPI). Do not rewrite the foreign side. |
 | **DRIVER** | Host tree style wins (Linux kernel coding style, Zephyr conventions, etc.). Base supplements; see platforms/*.md. |

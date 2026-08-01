@@ -51,9 +51,10 @@ If the branch is unclear, open [classify-repo.md](references/classify-repo.md) a
 
 Run the Base procedure as if `write-legible-c` were invoked, using **this skill’s copies** (do not depend on a separate installed skill):
 
-1. Read [references/base/write-legible-c-SKILL.md](references/base/write-legible-c-SKILL.md) and [references/base/c-standard.md](references/base/c-standard.md) (normative checklist).
-2. Follow Base “Work in this order” and Base §14 pre-delivery checklist end-to-end.
-3. Deliver as Base specifies.
+1. Read [references/base/write-legible-c-SKILL.md](references/base/write-legible-c-SKILL.md) and [references/base/c-standard.md](references/base/c-standard.md) **§§1–14** (normative rules + §14 gate).
+2. Load Base disclosed files only when their branch fires (greenfield → [skeleton.md](references/base/skeleton.md); short/flat existing code → [near-miss-map-eat.md](references/base/near-miss-map-eat.md); repo guidance → [repository-level.md](references/base/repository-level.md)).
+3. Follow Base “Work in this order” and Base §14 end-to-end.
+4. Deliver as Base specifies.
 
 **Done when:** Base §14 is fully applied to the final diff (or deviations commented at site).
 
@@ -88,7 +89,7 @@ is not enough; cite the local source of the mechanism.
 
 | Path Class | Load |
 |------------|------|
-| ORCH | Base ([c-standard.md](references/base/c-standard.md) §4–8, §14–16) |
+| ORCH | Base ([c-standard.md](references/base/c-standard.md) §4–8, §14; near-miss → [near-miss-map-eat.md](references/base/near-miss-map-eat.md) when code already looks short/flat) |
 | HOT | [hot-rules.md](references/hot-rules.md) **first**; Base only where HOT does not override |
 | BOUND | Base adapter altitude; thin foreign wrap only |
 | DRIVER | Host style first; Base supplement; **required** platform appendix when known: [platforms/linux.md](references/platforms/linux.md), [platforms/zephyr.md](references/platforms/zephyr.md), or [platforms/rt-thread.md](references/platforms/rt-thread.md) |

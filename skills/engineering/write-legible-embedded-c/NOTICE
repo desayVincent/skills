@@ -12,3 +12,11 @@ write-legible-embedded-c embeds **write-legible-c** under:
 The Overlay (SKILL.md Hard Order, path-class, hot-rules, classify-repo,
 concurrency-memory, platforms) is separate team work and does not rebrand Base
 as original content.
+
+Packaging note (overlay only; rule semantics unchanged)
+-------------------------------------------------------
+Base normative text is c-standard.md sections 1–14. Former sections 15–18
+are disclosed as sibling files under references/base/ (skeleton.md,
+near-miss-map-eat.md, repository-level.md, PROVENANCE.md) for progressive
+disclosure. Attribution and MIT terms still apply to all Base files.
+

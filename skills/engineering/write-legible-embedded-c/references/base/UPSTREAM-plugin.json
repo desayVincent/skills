@@ -6,6 +6,14 @@
     "name": "7etsuo"
   },
   "homepage": "https://github.com/7etsuo/write-legible-c",
-  "keywords": ["c", "c11", "style", "agents", "legibility", "refactor"],
-  "license": "MIT"
+  "keywords": [
+    "c",
+    "c11",
+    "style",
+    "agents",
+    "legibility",
+    "refactor"
+  ],
+  "license": "MIT",
+  "packaging_note": "Vendored under write-legible-embedded-c/references/base/. Normative rules: c-standard.md \u00a7\u00a71\u201314. Disclosed: skeleton.md, near-miss-map-eat.md, repository-level.md, PROVENANCE.md. Overlay packaging only; rule semantics unchanged from write-legible-c."
 }
