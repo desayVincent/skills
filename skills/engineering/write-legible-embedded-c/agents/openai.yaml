@@ -1,0 +1,5 @@
+interface:
+  display_name: "Write Legible Embedded C"
+  short_description: "Host + embedded/ISR C legibility"
+policy:
+  allow_implicit_invocation: true

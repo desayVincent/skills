@@ -1,0 +1,13 @@
+Third-Party Notice
+==================
+
+write-legible-embedded-c embeds **write-legible-c** under:
+
+  write-legible-embedded-c/references/base/
+
+  Author: 7etsuo
+  Project: https://github.com/7etsuo/write-legible-c
+  License: MIT (see references/base/LICENSE)
+
+The Overlay (SKILL.md Hard Order, path-class, hot-rules, classify-repo,
+platforms) is separate team work and does not rebrand Base as original content.

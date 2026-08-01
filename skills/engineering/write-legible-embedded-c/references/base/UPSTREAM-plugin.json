@@ -1,0 +1,11 @@
+{
+  "name": "write-legible-c",
+  "version": "1.0.0",
+  "description": "Strict C11 machine-legibility standard for writing, refactoring, and reviewing C code in Grok Build.",
+  "author": {
+    "name": "7etsuo"
+  },
+  "homepage": "https://github.com/7etsuo/write-legible-c",
+  "keywords": ["c", "c11", "style", "agents", "legibility", "refactor"],
+  "license": "MIT"
+}
