@@ -27,7 +27,10 @@ Overlay ≥ Base.
 
 **Classify before styling.** The active tree and execution context decide which
 rules apply. Base rules improve legibility only where they do not conflict with
-the code's real kernel, BSP, RTOS, or interface constraints.
+the code's real kernel, BSP, RTOS, or interface constraints. The live tree is the
+external single source of truth; this skill points at it and requires the agent
+to consult it — never invent a “common” locking, allocator, or ISR pattern in
+place of the tree’s actual contract (**prior contamination** defence).
 
 ---
 
@@ -76,8 +79,10 @@ Follow [references/path-class.md](references/path-class.md).
 
 **Done when:** each region has Path Class ∈ {ORCH, HOT, BOUND, DRIVER} and
 CTX ∈ {ISR, Deferred, Thread, Init} (or N/A), with its entry path, ownership,
-and synchronization or MMIO mechanism identified. Defaults: Nested Kernel/BSP
-→ DRIVER (ISR/fast → HOT); Super SDK → ORCH.
+and synchronization or MMIO mechanism **named** and tied to a header or nearby
+in-tree precedent that establishes the required pattern. Defaults: Nested
+Kernel/BSP → DRIVER (ISR/fast → HOT); Super SDK → ORCH. “I judged it appropriate”
+is not enough; cite the local source of the mechanism.
 
 ### 3. Load rules
 
@@ -104,7 +109,9 @@ platform and concurrency/memory reference has been read.
 Map the touched code before reshaping it: owner, entry path, execution context,
 state or resource lifetime, lock/atomic/MMIO boundary, held-lock calls,
 allocation and teardown path, and externally visible ABI or binding. Keep that
-map consistent with the active tree's nearby code.
+map consistent with the active tree's nearby code. Prefer *context-legal*,
+*bounded*, and *quiesce* decisions taken from the tree over pretrained “common”
+patterns.
 
 ORCH regions use the full Base orchestrator/leaf/adapter + name test. HOT code
 keeps a tight critical path; split only at a real concept, data boundary, or
@@ -129,7 +136,9 @@ visible to the next editor.
   not run with reason.
 
 **Done when:** the Classification record is complete for every touched region,
-and every applicable checklist item is answered against the final diff.
+every applicable checklist item is answered against the final diff, and every
+named lock/atomic/allocator/MMIO mechanism cites the header or nearby precedent
+that establishes it.
 
 ---
 
