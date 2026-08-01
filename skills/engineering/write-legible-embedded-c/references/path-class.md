@@ -35,6 +35,11 @@ Which legibility regime applies:
 
 ## Classification record
 
-Record Path Class and Execution Context in the delivery or review record. Add a
-source comment only when the context is not evident from the entry point,
-locking, or platform API, and follow the host tree's comment style.
+Record **Path Class** and **Execution Context** in the Classification record
+template in [classify-repo.md](classify-repo.md). That template is the only
+required artifact for “classification recorded.”
+
+Add a source comment only when the context is not evident from the entry point,
+locking, or platform API, and follow the host tree's comment style (DRIVER does
+not invent non-tree markers such as `/* PATH: HOT */` unless the tree already
+uses an equivalent convention).

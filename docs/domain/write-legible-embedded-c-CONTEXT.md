@@ -23,7 +23,8 @@ contextType: "general"
 | BOUND | 边界档：薄 adapter 对接冻结的 Vendor/SDK/内核公共 API；不重写对方实现。 |
 | DRIVER | 驱动树档：宿主树风格优先（如 Linux kernel coding style、Zephyr 惯例）；Base Standard 作补充而非压过宿主。 |
 | HOT Rules (H1–H6) | ISR∩HOT 的硬规则集：H1 关闭 15/40 行数目标；H2 每个调用按时延、栈、锁与延后策略证明合理，而非机械地要求零调用；H3 能延后必须延后；H4 跨上下文共享数据须明确读写者、同步与内存序（`volatile` 不能代替并发同步）；H5 只做当前上下文允许的操作；H6 在交付/审查记录中保留 PATH/CTX，源码仅为不明显约束添加注释。 |
-| Overlay Doc Layers | Overlay 文档切分：L0 正文（两轴、优先级、H1–H6、BOUND/ORCH/DRIVER 与仓库类型通则，每次必读）；L1 平台附录（Linux、Zephyr、RT-Thread 的接口/上下文/构建验证决策清单，按平台加载）；L2 不进 skill（完整内核/API 手册，查官方文档）。 |
+| Overlay Doc Layers | Overlay 文档切分：L0 正文（两轴、优先级、H1–H6、BOUND/ORCH/DRIVER 与仓库类型通则，每次必读）；L1 平台附录 = **平台决策与验证清单**（按平台加载）：可含本地契约、接口/并发/MMIO、以及 verification 行——**不是**“仅冲突对照表”。**Linux 为深度 L1 样板**；Zephyr/RT-Thread 可为较薄决策表，属声明过的不对称，不为对称硬编。L2 不进 skill（完整内核/API 手册，查官方文档）。 |
+| Classification record | 交付/审查时的唯一分类产物，模板在 `references/classify-repo.md`。必填 Branch、Active Git Root、Repo Kind、Platform、Path Class、CTX、Governing rules；HOT 时填 HOT call notes。Step 5、H6、path-class 均指向此模板，而非源码里的 `/* PATH */` 标记。 |
 | Super SDK Repo | 顶层大 git 仓库：产品/SDK 主体。工作树内可**嵌套**其它 git 仓库（子模块或嵌套 clone）。 |
 | Nested Kernel/BSP Repo | 位于 Super SDK 工作树某路径下的嵌套 git 仓（如 Linux/BSP 路径）：内核、驱动、中断、线程、板级与硬件紧耦合代码。 |
 | Repo Kind | 推断第一刀：当前文件落在**哪一个 Active Git Root**——在 Super SDK 根下且不在嵌套内核仓内 → SDK 姿态；在 Nested Kernel/BSP 根内 → 内核/BSP 姿态。 |

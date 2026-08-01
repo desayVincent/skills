@@ -1,19 +1,18 @@
 ---
 name: write-legible-embedded-c
 description: >
-  Embedded and kernel C for Linux/BSP, Zephyr, RT-Thread, and bare-metal
-  firmware. Use when creating, modifying, reviewing, or debugging C drivers,
-  ISR or deferred paths, multithreaded shared state, lock-held code, malloc/free
-  ownership, MMIO/DMA, board bring-up, or SDK boundaries; also when the user
-  invokes /write-legible-embedded-c.
+  Legible C for host userspace and for Linux/BSP, Zephyr, RT-Thread, or
+  bare-metal work. Use when writing or reviewing host C, Super-SDK middleware,
+  drivers, ISR or deferred paths, shared state under locks, MMIO/DMA, board
+  bring-up, or SDK boundaries; also /write-legible-embedded-c.
 metadata:
-  short-description: "Linux, Zephyr, RT-Thread + BSP C"
+  short-description: "Host + Linux/Zephyr/RTT C legibility"
 ---
 
 # Write Legible Embedded C
 
-**One skill** for the team. It owns the C-legibility rules for the session and
-ships the Base Standard, so a second skill install is unnecessary.
+**Classify before styling.** One skill covers host userspace and embedded trees.
+Base is vendored under [references/base/](references/base/); no second skill install.
 
 Internally it uses two layers:
 
@@ -41,7 +40,7 @@ the code's real kernel, BSP, RTOS, or interface constraints.
 | **HOST** | Pure host userspace C; or Super SDK code with no nested-kernel Active Git Root and no ISR/driver/HOT intent |
 | **EMBEDDED** | Nested Kernel/BSP Active Git Root; Linux/Zephyr/RT-Thread/BSP drivers; ISR/Deferred; Path Class HOT/DRIVER; or user says embedded/kernel/RTOS |
 
-If unsure: resolve Active Git Root ([classify-repo.md](references/classify-repo.md)). Nested Kernel/BSP → **EMBEDDED**. Otherwise default **HOST**, unless the user asked for interrupt/driver work.
+If the branch is unclear, open [classify-repo.md](references/classify-repo.md) and use its defaults.
 
 ---
 
@@ -87,22 +86,15 @@ and synchronization or MMIO mechanism identified. Defaults: Nested Kernel/BSP
 | ORCH | Base ([c-standard.md](references/base/c-standard.md) §4–8, §14–16) |
 | HOT | [hot-rules.md](references/hot-rules.md) **first**; Base only where HOT does not override |
 | BOUND | Base adapter altitude; thin foreign wrap only |
-| DRIVER | Host style first; Base supplement; [platforms/](references/platforms/) if known |
+| DRIVER | Host style first; Base supplement; **required** platform appendix when known: [platforms/linux.md](references/platforms/linux.md), [platforms/zephyr.md](references/platforms/zephyr.md), or [platforms/rt-thread.md](references/platforms/rt-thread.md) |
 
-Load exactly the applicable platform appendix before designing the change:
+Linux is the deep L1 profile; Zephyr and RT-Thread appendices are thinner
+conflict/decision tables unless expanded later. Bare-metal or unlisted RTOS:
+Path Class + HOT, plus the active BSP's own build/HAL/startup rules.
 
-| Platform | Appendix | Required for |
-|---|---|---|
-| Linux | [platforms/linux.md](references/platforms/linux.md) | Kernel/BSP drivers, Kconfig/Kbuild, Device Tree, MMIO/DMA, lifecycle, verification |
-| Zephyr | [platforms/zephyr.md](references/platforms/zephyr.md) | Drivers, Kconfig/CMake, devicetree/bindings, device model, ISR/work, verification |
-| RT-Thread | [platforms/rt-thread.md](references/platforms/rt-thread.md) | BSP/drivers, SCons/Kconfig, device/component lifecycle, ISR/IPC, verification |
-
-When touched code crosses execution contexts, shares mutable state, holds a
-lock or interrupt/scheduler mask, or allocates/releases memory, read
+When code crosses contexts, shares mutable state, holds a lock or
+interrupt/scheduler mask, or allocates/releases memory, read
 [concurrency-memory.md](references/concurrency-memory.md) before editing.
-
-For bare-metal or an unlisted RTOS, apply Path Class + HOT rules and load the
-active BSP's own build, HAL, startup, linker, interrupt, and memory-map rules.
 
 **Done when:** the override set is explicit (HOT ⇒ H1–H6), and any applicable
 platform and concurrency/memory reference has been read.
@@ -124,27 +116,28 @@ visible to the next editor.
 
 ### 5. Verify
 
-- Classification recorded (Root, Kind, Path, CTX, and governing tree rules).
+- Fill the **Classification record** in
+  [classify-repo.md](references/classify-repo.md) (single home for Root, Kind,
+  Platform, Path Class, CTX, governing rules).
 - HOT ⇒ H1–H6 checklist in [hot-rules.md](references/hot-rules.md).
-- Shared state, lock, or allocation work ⇒ the completion checklist in
+- Shared state, lock, or allocation work ⇒ checklist in
   [concurrency-memory.md](references/concurrency-memory.md).
 - ORCH/BOUND ⇒ Base §14 on those hunks.
-- Platform work ⇒ the selected appendix's verification rows relevant to the
-  diff; an unlisted platform ⇒ the active BSP's documented equivalent checks.
-- Run the project-provided build/tests when available. Report every applicable
-  check as passed, failed, or not run with the precise reason.
+- Platform work ⇒ **only** the selected L1 appendix's verification section
+  (do not restate those rows here).
+- Run project build/tests when available; mark each check passed / failed /
+  not run with reason.
 
-**Done when:** all applicable checklist items are answered against the final
-diff; unverified hardware, configuration, or command paths are named rather
-than assumed.
+**Done when:** the Classification record is complete for every touched region,
+and every applicable checklist item is answered against the final diff.
 
 ---
 
 ## Deliver
 
-Report: branch (HOST|EMBEDDED); if EMBEDDED, Active Git Root, Repo Kind, Path
-Class, CTX, and governing constraints; behavior change; structure; deviations;
-verification.
+Include the filled Classification record from
+[classify-repo.md](references/classify-repo.md). Then: behavior change;
+structure; deviations; verification.
 
 ## Attribution
 

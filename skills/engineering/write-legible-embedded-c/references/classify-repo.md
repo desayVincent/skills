@@ -38,11 +38,23 @@ Rules:
 3. If Active Git Root says Super SDK but path looks like `docs/linux-integration` → **Root wins** (stay ORCH), do not switch to DRIVER.
 4. Keywords alone never override a clear Nested Kernel/BSP root.
 
-## Completion record (template)
+## Classification record (template)
+
+**Single home** for delivery/review classification. Step 5, H6, and
+[path-class.md](path-class.md) all point here. Fill one block per coherent
+edit (or one block per region if Path/CTX differ).
 
 ```
+Branch: HOST | EMBEDDED
 Active Git Root: <path>
 Repo Kind: Super SDK | Nested Kernel/BSP
-Platform: linux | zephyr | rt-thread | unknown
+Platform: linux | zephyr | rt-thread | bare-metal | unknown
+Path Class: ORCH | HOT | BOUND | DRIVER
+Execution Context (CTX): ISR | Deferred | Thread | Init | N/A
+Governing rules: <tree style / Kconfig owner / ABI / binding — short>
 Keyword notes: <optional>
+HOT call notes (if Path Class = HOT): <call site → why not deferred / latency bound source>
 ```
+
+**Done when:** every field above is filled for each region you change (HOT call
+notes may be `none` if there are no non-trivial HOT calls).

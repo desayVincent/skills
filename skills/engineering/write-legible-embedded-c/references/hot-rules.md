@@ -9,10 +9,16 @@ Base **target 15 / hard 40** do **not** force splits on HOT. Nesting still prefe
 ## H2 — Call budget follows the latency contract
 
 Treat each call on the HOT path as a latency, stack, locking, and deferral
-decision. Keep calls whose context and bounded work fit the actual contract;
-use the tree's existing inline or leaf patterns for simple register access.
-Avoid duplicating logic merely to satisfy an artificial zero-call budget. A
-non-obvious hard-IRQ call or exception gets a source-site reason.
+decision. Prefer the tree's existing inline or leaf patterns for simple
+register access. Do not invent a zero-call budget that the host tree does not
+use.
+
+**Checkable product:** list every non-trivial HOT call in the Classification
+record **HOT call notes** field
+([classify-repo.md](classify-repo.md)) as
+`call site → why not deferred / latency bound source`. Use `none` when there
+are no such calls. A non-obvious hard-IRQ exception may also get a source-site
+reason in host style.
 
 ## H3 — Defer when possible
 
@@ -37,15 +43,18 @@ comment that names the constraint.
 
 ## H6 — Record the path
 
-Record the HOT/CTX classification in the delivery or review record. Add a
-source comment only when the context constraint is not obvious from the entry
-point, locking, or platform API; follow the host tree's comment style.
+Record HOT/CTX in the Classification record template in
+[classify-repo.md](classify-repo.md) (fields **Path Class**, **CTX**, and when
+applicable **HOT call notes**). That is the verification target for H6.
+
+Add a source comment only when the context constraint is not obvious from the
+entry point, locking, or platform API; follow the host tree's comment style.
 
 ## HOT checklist (pre-delivery)
 
 - [ ] H1: no split done only for Base 15/40
-- [ ] H2: every HOT call is context-legal and justified by the latency contract
+- [ ] H2: every non-trivial HOT call is listed in Classification record **HOT call notes** as `call site → why not deferred / latency bound source` (or `none`)
 - [ ] H3: nothing deferrable left in ISR without reason
 - [ ] H4: every cross-context datum has an explicit synchronization and ordering story
 - [ ] H5: every operation is legal for the active context
-- [ ] H6: HOT/CTX recorded; non-obvious source constraints documented
+- [ ] H6: Path Class + CTX filled in Classification record; non-obvious source constraints documented
