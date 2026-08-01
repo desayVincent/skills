@@ -1,19 +1,19 @@
 ---
 name: write-legible-embedded-c
 description: >
-  Write and review legible C for host userspace and embedded: Super SDK trees,
-  nested Linux/Zephyr/RT-Thread BSP git repos, BSP, ISR, drivers, threads, and
-  portable C APIs. Use for .c/.h, kernel or RTOS drivers, interrupt or hot-path
-  code, team C SDKs, and general C11 legibility. Also /write-legible-embedded-c.
-  Applies bundled Base Standard (write-legible-c) for ORCH/host code and Overlay
-  Path Class rules for embedded/HOT. Do not use for C++ or non-C tasks.
+  Embedded and kernel C for Linux/BSP, Zephyr, RT-Thread, and bare-metal
+  firmware. Use when creating, modifying, reviewing, or debugging C drivers,
+  ISR or deferred paths, multithreaded shared state, lock-held code, malloc/free
+  ownership, MMIO/DMA, board bring-up, or SDK boundaries; also when the user
+  invokes /write-legible-embedded-c.
 metadata:
-  short-description: "Legible C (host + embedded/ISR)"
+  short-description: "Linux, Zephyr, RT-Thread + BSP C"
 ---
 
 # Write Legible Embedded C
 
-**One skill** for the team. It always owns the session; it **never** requires a second skill install.
+**One skill** for the team. It owns the C-legibility rules for the session and
+ships the Base Standard, so a second skill install is unnecessary.
 
 Internally it uses two layers:
 
@@ -22,7 +22,13 @@ Internally it uses two layers:
 | **Base** | [references/base/](references/base/) (vendored [write-legible-c](https://github.com/7etsuo/write-legible-c), MIT / 7etsuo) | Host userspace, Super SDK ORCH, any Path Class that does not override |
 | **Overlay** | This file + [references/](references/) (except `base/`) | Nested kernel/BSP, DRIVER, HOT/ISR, platform appendices |
 
-**Constraint Priority:** platform / latency / size / frozen API ≥ Overlay ≥ Base.
+**Constraint priority:** governing tree and subsystem rules, ABI/binding or
+generated-source requirements, execution-context/latency/safety/size limits ≥
+Overlay ≥ Base.
+
+**Classify before styling.** The active tree and execution context decide which
+rules apply. Base rules improve legibility only where they do not conflict with
+the code's real kernel, BSP, RTOS, or interface constraints.
 
 ---
 
@@ -61,13 +67,18 @@ Do not apply Base **15/40 line budgets** until Path Class is known.
 
 Follow [references/classify-repo.md](references/classify-repo.md).
 
-**Done when:** each touched file has Active Git Root, Repo Kind (Super SDK vs Nested Kernel/BSP), and platform if known. Root beats keywords; on conflict ask or take Root.
+**Done when:** each touched file has Active Git Root, Repo Kind (Super SDK vs
+Nested Kernel/BSP), platform if known, and the local rules/build files that
+govern it. Root beats keywords; on conflict ask or take Root.
 
 ### 2. Assign Path Class and Execution Context
 
 Follow [references/path-class.md](references/path-class.md).
 
-**Done when:** each region has Path Class ∈ {ORCH, HOT, BOUND, DRIVER} and CTX ∈ {ISR, Deferred, Thread, Init} (or N/A). Defaults: Nested Kernel/BSP → DRIVER (ISR/fast → HOT); Super SDK → ORCH.
+**Done when:** each region has Path Class ∈ {ORCH, HOT, BOUND, DRIVER} and
+CTX ∈ {ISR, Deferred, Thread, Init} (or N/A), with its entry path, ownership,
+and synchronization or MMIO mechanism identified. Defaults: Nested Kernel/BSP
+→ DRIVER (ISR/fast → HOT); Super SDK → ORCH.
 
 ### 3. Load rules
 
@@ -78,30 +89,62 @@ Follow [references/path-class.md](references/path-class.md).
 | BOUND | Base adapter altitude; thin foreign wrap only |
 | DRIVER | Host style first; Base supplement; [platforms/](references/platforms/) if known |
 
-**Done when:** override set is explicit (HOT ⇒ H1–H6).
+Load exactly the applicable platform appendix before designing the change:
+
+| Platform | Appendix | Required for |
+|---|---|---|
+| Linux | [platforms/linux.md](references/platforms/linux.md) | Kernel/BSP drivers, Kconfig/Kbuild, Device Tree, MMIO/DMA, lifecycle, verification |
+| Zephyr | [platforms/zephyr.md](references/platforms/zephyr.md) | Drivers, Kconfig/CMake, devicetree/bindings, device model, ISR/work, verification |
+| RT-Thread | [platforms/rt-thread.md](references/platforms/rt-thread.md) | BSP/drivers, SCons/Kconfig, device/component lifecycle, ISR/IPC, verification |
+
+When touched code crosses execution contexts, shares mutable state, holds a
+lock or interrupt/scheduler mask, or allocates/releases memory, read
+[concurrency-memory.md](references/concurrency-memory.md) before editing.
+
+For bare-metal or an unlisted RTOS, apply Path Class + HOT rules and load the
+active BSP's own build, HAL, startup, linker, interrupt, and memory-map rules.
+
+**Done when:** the override set is explicit (HOT ⇒ H1–H6), and any applicable
+platform and concurrency/memory reference has been read.
 
 ### 4. Design then edit
 
-Mark HOT/ISR: `/* PATH: HOT; CTX: ISR */`.  
-ORCH regions: full Base orchestrator/leaf/adapter + name test.  
-HOT: **do not** split only to satisfy Base 15/40.
+Map the touched code before reshaping it: owner, entry path, execution context,
+state or resource lifetime, lock/atomic/MMIO boundary, held-lock calls,
+allocation and teardown path, and externally visible ABI or binding. Keep that
+map consistent with the active tree's nearby code.
+
+ORCH regions use the full Base orchestrator/leaf/adapter + name test. HOT code
+keeps a tight critical path; split only at a real concept, data boundary, or
+deferral boundary, rather than to satisfy Base 15/40 targets. Add a source
+comment only where a non-obvious hardware or context constraint needs to stay
+visible to the next editor.
 
 **Done when:** every touched function matches the active class.
 
 ### 5. Verify
 
-- Classification recorded (Root, Kind, Path, CTX).
+- Classification recorded (Root, Kind, Path, CTX, and governing tree rules).
 - HOT ⇒ H1–H6 checklist in [hot-rules.md](references/hot-rules.md).
+- Shared state, lock, or allocation work ⇒ the completion checklist in
+  [concurrency-memory.md](references/concurrency-memory.md).
 - ORCH/BOUND ⇒ Base §14 on those hunks.
-- Build/tests if available; no false compliance claims.
+- Platform work ⇒ the selected appendix's verification rows relevant to the
+  diff; an unlisted platform ⇒ the active BSP's documented equivalent checks.
+- Run the project-provided build/tests when available. Report every applicable
+  check as passed, failed, or not run with the precise reason.
 
-**Done when:** all applicable checklist items answered.
+**Done when:** all applicable checklist items are answered against the final
+diff; unverified hardware, configuration, or command paths are named rather
+than assumed.
 
 ---
 
 ## Deliver
 
-Report: branch (HOST|EMBEDDED); if EMBEDDED, Repo Kind + Path Class + CTX; behavior change; structure; deviations; verification.
+Report: branch (HOST|EMBEDDED); if EMBEDDED, Active Git Root, Repo Kind, Path
+Class, CTX, and governing constraints; behavior change; structure; deviations;
+verification.
 
 ## Attribution
 

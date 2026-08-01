@@ -18,6 +18,7 @@ write-legible-embedded-c/
 └── references/
     ├── base/          # third-party write-legible-c (MIT, 7etsuo)
     ├── classify-repo.md
+    ├── concurrency-memory.md
     ├── path-class.md
     ├── hot-rules.md
     └── platforms/

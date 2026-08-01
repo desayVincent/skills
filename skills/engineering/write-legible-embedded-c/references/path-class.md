@@ -33,12 +33,8 @@ Which legibility regime applies:
 | Super SDK | glue calling kernel/BSP headers | BOUND | Thread |
 | Super SDK | must not contain kernel-private includes | — | fix structure |
 
-## Annotation
+## Classification record
 
-At ISR/HOT entry (or file section):
-
-```c
-/* PATH: HOT; CTX: ISR */
-```
-
-Optional for clarity on ORCH public APIs: `/* PATH: ORCH; CTX: Thread */`.
+Record Path Class and Execution Context in the delivery or review record. Add a
+source comment only when the context is not evident from the entry point,
+locking, or platform API, and follow the host tree's comment style.

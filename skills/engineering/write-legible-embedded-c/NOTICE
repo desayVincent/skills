@@ -10,4 +10,5 @@ write-legible-embedded-c embeds **write-legible-c** under:
   License: MIT (see references/base/LICENSE)
 
 The Overlay (SKILL.md Hard Order, path-class, hot-rules, classify-repo,
-platforms) is separate team work and does not rebrand Base as original content.
+concurrency-memory, platforms) is separate team work and does not rebrand Base
+as original content.
