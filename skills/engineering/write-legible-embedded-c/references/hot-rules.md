@@ -2,6 +2,10 @@
 
 Apply when **Path Class = HOT** (typically **CTX = ISR** or an explicit fast path). These override Base Standard line-count and “split for cleanliness” pressure.
 
+Prefer the tree’s existing *bounded*, *context-legal* patterns. Do not invent a
+zero-call budget, lock style, or deferral shape that the host tree does not use
+(**prior contamination** defence).
+
 ## H1 — Line budget off
 
 Base **target 15 / hard 40** do **not** force splits on HOT. Nesting still prefer ≤2. Split only for a real concept, shared data boundary, or required deferral—not for line count.
@@ -32,14 +36,15 @@ MMIO accessor for device registers; use the tree's lock, atomic, IRQ-safe
 critical section, `READ_ONCE`/`WRITE_ONCE`, or documented memory-ordering
 primitive for normal shared state. `volatile` is not a generic synchronization
 or ordering mechanism; use it only where the platform interface requires it.
+Name the primitive and the header or nearby precedent that establishes it.
 
 ## H5 — Context-legal work only
 
 Apply the [concurrency and memory contract](concurrency-memory.md). Use only
 operations legal in the active execution context. Keep waits and lock hold time
-bounded; move work whose latency or sleepability cannot be justified to
+*bounded*; move work whose latency or sleepability cannot be justified to
 Deferred or Thread context. A documented platform exception gets a source-site
-comment that names the constraint.
+comment that names the constraint and its source in the tree.
 
 ## H6 — Record the path
 
@@ -55,6 +60,6 @@ entry point, locking, or platform API; follow the host tree's comment style.
 - [ ] H1: no split done only for Base 15/40
 - [ ] H2: every non-trivial HOT call is listed in Classification record **HOT call notes** as `call site → why not deferred / latency bound source` (or `none`)
 - [ ] H3: nothing deferrable left in ISR without reason
-- [ ] H4: every cross-context datum has an explicit synchronization and ordering story
-- [ ] H5: every operation is legal for the active context
+- [ ] H4: every cross-context datum has an explicit synchronization and ordering story, with the primitive cited to the tree
+- [ ] H5: every operation is *context-legal* for the active context, with *bounded* hold/latency evidence
 - [ ] H6: Path Class + CTX filled in Classification record; non-obvious source constraints documented
