@@ -3,3 +3,7 @@
 *~
 .scratch/
 node_modules/
+
+# skill-creator eval workspaces
+*-workspace/
+.factory/

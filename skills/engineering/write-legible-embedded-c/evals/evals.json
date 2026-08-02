@@ -1,0 +1,49 @@
+{
+  "skill_name": "write-legible-embedded-c",
+  "evals": [
+    {
+      "id": 1,
+      "name": "host-session-sm",
+      "prompt": "You are working in a Super SDK host tree (pure userspace C11, no kernel/IRQ). Implement the public API in include/sess/sess.h as a session state machine under src/. Behavior: IDLE after init; OPEN_REQ→OPENING; OPEN_OK→OPEN; OPEN_FAIL stays OPENING while attempt_count<=max_retries else FAULTED; DATA only in OPEN if len<=max_payload_bytes; CLOSE_REQ→CLOSING; CLOSE_DONE→CLOSED; ERROR from OPENING/OPEN/CLOSING→FAULTED; illegal transitions return error and leave state. Deliver implementation + DELIVERABLE.md. Keep sess.h unchanged.",
+      "expected_output": "Host C implementation with Base-style status enum, small orchestrator/leaf structure, §14-style verification in deliverable; MODULE_TRY-like propagation when applicable.",
+      "files": [],
+      "expectations": [
+        "DELIVERABLE.md applies or lists Base §14 pre-delivery checklist items (or explicit pass/fail per item)",
+        "Code defines a module status enum with success equal to 0 (e.g. SESS_OK)",
+        "Code uses a MODULE_TRY / FOO_TRY style macro for fallible propagation in a non-acquiring orchestrator, OR documents a Base §9 deviation at the source site",
+        "sess_feed (or equivalent) is an orchestrator that dispatches to per-event helpers rather than one monolithic 80+ line function",
+        "Implementation stays host-only (no IRQ, spinlock, readl, workqueue, or kernel headers)",
+        "Public API symbols from sess.h are implemented"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "embedded-irq-ring",
+      "prompt": "Nested Kernel/BSP-shaped fixture (own git root). Implement drivers/foo API from drivers/foo/foo.h: hard IRQ reads sample via readl, acks via writel, pushes FOO_RING_CAP ring under spin_lock_irqsave, overflow calls foo_note_drop, schedule_work for deferred wake_up_interruptible; thread foo_read_samples drains ring; foo_dev_init/exit and foo_eval_process_deferred. Prefer tree primitives in include/linux and CODING_STYLE.md. No portable reactor. Deliver under your outputs/ with DELIVERABLE.md and src/*.",
+      "expected_output": "IRQ→ring→deferred→read implementation plus EMBEDDED Classification records (multi-region Path Class/CTX, HOT call notes on HOT).",
+      "files": [],
+      "expectations": [
+        "DELIVERABLE.md contains Classification record fields: Branch, Active Git Root, Repo Kind, Platform, Path Class, CTX, Governing rules",
+        "Separate Classification regions (or clearly separated blocks) for HOT/ISR vs Deferred and/or Thread",
+        "HOT region includes HOT call notes as none or call→reason lines (not omitted on HOT)",
+        "IRQ path uses schedule_work (or tree deferred API) and does not call wake_up_interruptible inside the hard IRQ handler",
+        "Ring overflow path calls foo_note_drop",
+        "MMIO uses readl/writel (not raw pointer stores for device regs)"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "host-cfgparse",
+      "prompt": "Super SDK host-only tool: implement include/cfgparse.h. Parse non-empty KEY=VALUE lines (trim spaces around key/value optional). Reject empty key, missing '=', table full, or oversized key/value with distinct error statuses. cfg_get copies value or returns not-found. Pure C11 userspace. Deliver src/* + DELIVERABLE.md. Keep public header API stable.",
+      "expected_output": "cfgparse module with status enum, boundary validation, Base-oriented file layout and §14 deliverable notes.",
+      "files": [],
+      "expectations": [
+        "Module status enum with success = 0 and prefixed error codes",
+        "Public entry points validate NULL/args and return error status (not crash)",
+        "DELIVERABLE documents verification against Base §14 or a systematic structure checklist",
+        "No kernel/RTOS/IRQ APIs in the implementation",
+        "cfg_parse_line and cfg_get are implemented with checkable error returns"
+      ]
+    }
+  ]
+}
