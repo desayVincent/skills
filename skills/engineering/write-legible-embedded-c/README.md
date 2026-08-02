@@ -2,11 +2,14 @@
 
 Single skill for **host userspace C** and **embedded/kernel/BSP C** (Linux, Zephyr, RT-Thread).
 
-**Classify before styling.** Model-invoked description covers both host and embedded branches.
+**Correctness before shape; classify before styling.** The model-invoked
+description covers both host and embedded branches without project-specific
+trigger vocabulary.
 
 | Branch | Behavior |
 |--------|----------|
-| **HOST** | Vendored Base (`references/base/` = write-legible-c); §14 fail-closed; `MODULE_TRY` on non-acquiring orchestrators (Base §9) |
+| **ALL** | `references/c-quality.md` correctness floor before legibility rules |
+| **HOST** | Vendored Base applied through the quality floor; both the quality checklist and Base §14 are fail-closed |
 | **EMBEDDED** | Hard Order: Active Git Root → Path Class → HOT / DRIVER / ORCH |
 
 **L1 platforms:** Linux appendix is the deep profile; Zephyr/RT-Thread are thinner decision tables by design.
@@ -34,6 +37,7 @@ write-legible-embedded-c/
     │   ├── LICENSE
     │   └── UPSTREAM-plugin.json
     ├── classify-repo.md
+    ├── c-quality.md
     ├── concurrency-memory.md
     ├── path-class.md
     ├── hot-rules.md

@@ -4,7 +4,7 @@
     {
       "id": 1,
       "name": "host-session-sm",
-      "prompt": "You are working in a Super SDK host tree (pure userspace C11, no kernel/IRQ). Implement the public API in include/sess/sess.h as a session state machine under src/. Behavior: IDLE after init; OPEN_REQ→OPENING; OPEN_OK→OPEN; OPEN_FAIL stays OPENING while attempt_count<=max_retries else FAULTED; DATA only in OPEN if len<=max_payload_bytes; CLOSE_REQ→CLOSING; CLOSE_DONE→CLOSED; ERROR from OPENING/OPEN/CLOSING→FAULTED; illegal transitions return error and leave state. Deliver implementation + DELIVERABLE.md. Keep sess.h unchanged.",
+      "prompt": "You are working in a product/SDK host tree (pure userspace C11, no kernel/IRQ). Implement the public API in include/sess/sess.h as a session state machine under src/. Behavior: IDLE after init; OPEN_REQ→OPENING; OPEN_OK→OPEN; OPEN_FAIL stays OPENING while attempt_count<=max_retries else FAULTED; DATA only in OPEN if len<=max_payload_bytes; CLOSE_REQ→CLOSING; CLOSE_DONE→CLOSED; ERROR from OPENING/OPEN/CLOSING→FAULTED; illegal transitions return error and leave state. Deliver implementation + DELIVERABLE.md. Keep sess.h unchanged.",
       "expected_output": "Host C implementation with Base-style status enum, small orchestrator/leaf structure, §14-style verification in deliverable; MODULE_TRY-like propagation when applicable.",
       "files": [],
       "expectations": [
@@ -34,7 +34,7 @@
     {
       "id": 3,
       "name": "host-cfgparse",
-      "prompt": "Super SDK host-only tool: implement include/cfgparse.h. Parse non-empty KEY=VALUE lines (trim spaces around key/value optional). Reject empty key, missing '=', table full, or oversized key/value with distinct error statuses. cfg_get copies value or returns not-found. Pure C11 userspace. Deliver src/* + DELIVERABLE.md. Keep public header API stable.",
+      "prompt": "Product/SDK host-only tool: implement include/cfgparse.h. Parse non-empty KEY=VALUE lines (trim spaces around key/value optional). Reject empty key, missing '=', table full, or oversized key/value with distinct error statuses. cfg_get copies value or returns not-found. Pure C11 userspace. Deliver src/* + DELIVERABLE.md. Keep public header API stable.",
       "expected_output": "cfgparse module with status enum, boundary validation, Base-oriented file layout and §14 deliverable notes.",
       "files": [],
       "expectations": [
@@ -43,6 +43,63 @@
         "DELIVERABLE documents verification against Base §14 or a systematic structure checklist",
         "No kernel/RTOS/IRQ APIs in the implementation",
         "cfg_parse_line and cfg_get are implemented with checkable error returns"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "host-wire-header",
+      "prompt": "Write C99 code for pkt_decode(struct pkt_header *out, const uint8_t *buf, size_t len). The 8-byte wire header is version:u8, flags:u8, payload_len:big-endian u16, sequence:big-endian u32. Reject NULL, short input, reserved flag bits, and payload_len greater than the remaining bytes with distinct enum statuses. Leave *out unchanged on failure. Deliver code plus a short quality audit.",
+      "expected_output": "A bounds-first wire decoder with explicit representation handling and no alignment, aliasing, endian, narrowing, or partial-output hazards.",
+      "files": [],
+      "expectations": [
+        "Decoder validates pointers and len before every indexed read",
+        "Wire integers are decoded explicitly without casting buf to a struct or integer pointer",
+        "payload_len is range-checked against len - header size without unsigned underflow",
+        "The output object is committed only after all validation succeeds",
+        "size_t is used for buffer sizes while fixed-width types are used for wire fields",
+        "Code honors C99 and does not introduce a C11-only requirement"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "host-frozen-cleanup",
+      "prompt": "In an existing C99 host module, implement a frozen public int widget_open(struct widget *w) API. The nearby module uses errno-style negative returns and forward goto cleanup labels. The function acquires a file descriptor, a heap buffer, and then a library handle; each later failure must release earlier resources in reverse order and leave w closed. Preserve the public API and local cleanup idiom. Deliver code plus a short quality audit.",
+      "expected_output": "Repository-native error handling with one visible reverse-order unwind, no invented status protocol, and no leaked or half-published state.",
+      "files": [],
+      "expectations": [
+        "Frozen int/errno API is preserved rather than replaced with a module status enum",
+        "Forward cleanup labels follow the stated local idiom and release resources in reverse acquisition order",
+        "Failure paths leave widget state closed and do not publish partially initialized ownership",
+        "Each acquired resource has exactly one matching release responsibility",
+        "Code honors the repository C99 dialect and local interfaces over Base stylistic defaults"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "embedded-ring-boundary",
+      "prompt": "In an embedded C fixture, implement foo_ring_push and foo_ring_pop for a fixed array whose FOO_RING_CAP is 10 and is not a power of two. The caller already holds the documented tree lock. The ring stores head, tail, and count; full push returns FOO_ERR_FULL without modifying the ring, and empty pop returns FOO_ERR_EMPTY without modifying the output. Add tests for first/last slots, full/empty, wrap-around, and repeated wrap cycles. Deliver code plus the C quality checklist.",
+      "expected_output": "A bounded ring implementation whose indices and count remain valid across full, empty, and repeated wrap-around transitions.",
+      "files": [],
+      "expectations": [
+        "Every array access uses an index strictly less than FOO_RING_CAP",
+        "Wrap logic does not use a power-of-two mask for capacity 10",
+        "Count remains within 0..FOO_RING_CAP and distinguishes full from empty",
+        "Failed push/pop preserves ring state and failed pop preserves the output",
+        "Tests cover last-slot access, wrap to zero, full, empty, and repeated cycles"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "embedded-teardown-quiesce",
+      "prompt": "In a Linux/BSP-shaped fixture, a hard IRQ queues dev->work and both paths dereference the device ring and MMIO state. Local subsystem docs require foo_dev_exit to mask the device interrupt source, disable and synchronize the IRQ, cancel_work_sync, release the IRQ, then release MMIO/ring/device state. Implement the teardown with tree APIs, without waiting while holding the device spinlock. Deliver code plus an ownership/concurrency audit.",
+      "expected_output": "A teardown that stops producers, drains every asynchronous user, and only then releases shared device state.",
+      "files": [],
+      "expectations": [
+        "Device interrupt production is masked before IRQ synchronization",
+        "IRQ is disabled and synchronized before shared state can be released",
+        "Deferred work is synchronously cancelled before MMIO/ring/device release",
+        "No spinlock is held across IRQ synchronization or cancel_work_sync",
+        "The audit accounts for IRQ, work, normal shutdown, and partial-init ownership"
       ]
     }
   ]

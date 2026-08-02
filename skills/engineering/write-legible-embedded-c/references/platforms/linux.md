@@ -17,7 +17,7 @@ Do not invent `ARCH`, toolchain, or kernel-version range the tree does not state
 | Style / idiom | Linux coding style, subsystem rules, nearby code over Base formatting/decomposition |
 | Types / annotations | Keep `u32`, `__iomem`, `__user`, kernel wrappers; do not force Base C11/userspace conventions |
 | Resource lifetime | Owner + release; `devm_*` or manual only when lifetime matches device/error/unbind |
-| Error unwind | Single forward `goto` cleanup when local and visible; subsystem label names/order |
+| Error unwind | Prefer in-tree forward `goto` cleanup (`goto err_…`) when local and visible; keep subsystem label names/order. **Do not** remove goto only to match Base “no goto”. |
 | Kconfig/Kbuild | Preserve `select`/`depends on`, linkage, build coverage |
 | DT / bindings | Compatible, properties, schemas are interfaces; update bindings when DT contract changes |
 | uAPI / exports | BOUND; preserve layout, numbering, compatibility unless ABI change approved |

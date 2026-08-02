@@ -1,28 +1,48 @@
 ---
 name: write-legible-embedded-c
 description: >
-  Legible C for host userspace and for Linux/BSP, Zephyr, RT-Thread, or
-  bare-metal work. Use when writing or reviewing host C, Super-SDK middleware,
-  drivers, ISR or deferred paths, shared state under locks, MMIO/DMA, board
-  bring-up, or SDK boundaries; also /write-legible-embedded-c.
+  Legible, context-correct C writing and review. Use for host userspace C or
+  embedded, Linux-kernel, Zephyr, RT-Thread, BSP, and bare-metal C, especially
+  drivers, ISR/deferred paths, shared state, MMIO/DMA, board bring-up, and
+  platform boundaries.
 metadata:
-  short-description: "Host + Linux/Zephyr/RTT C legibility"
+  short-description: "Legible, context-correct host and embedded C"
 ---
 
 # Write Legible Embedded C
 
-**Classify before styling.** One skill for host userspace and embedded trees.
-Base is vendored under [references/base/](references/base/); no second skill install.
+**Correctness before shape; classify before styling.** Preserve behavior,
+representation, ownership, and target constraints before applying legibility
+preferences. Base is vendored under [references/base/](references/base/); no
+second skill install.
 
 | Layer | Where | When |
 |-------|--------|------|
-| **Base** | [references/base/](references/base/) (vendored [write-legible-c](https://github.com/7etsuo/write-legible-c), MIT / 7etsuo) | HOST; Super SDK ORCH; Path Class that does not override |
-| **Overlay** | This file + [references/](references/) (except `base/`) | Nested kernel/BSP, DRIVER, HOT/ISR, platform appendices |
+| **Quality floor** | [c-quality.md](references/c-quality.md) | Every branch, before Base or platform styling |
+| **Base** | [references/base/](references/base/) (vendored [write-legible-c](https://github.com/7etsuo/write-legible-c), MIT / 7etsuo) | HOST and compatible ORCH legibility |
+| **Platform overlay** | This file + other [references/](references/) | Embedded context, DRIVER, HOT/ISR, platform decisions |
 
-**Constraint priority:** tree / subsystem / ABI / latency / safety / size ≥
-Overlay ≥ Base. Mechanisms come from the **live tree** (and L1 appendix when
-known), not from pretrained “common” patterns — see
-[concurrency-memory.md](references/concurrency-memory.md) ban list (PC1–PC8).
+**Constraint priority:** user intent, live tree, language dialect, tests,
+ABI/wire/hardware contracts, execution context, safety, latency, and size ≥
+Quality floor + Platform overlay ≥ Base legibility preferences. Base rules
+are not evidence that a C operation is defined or target-correct. Mechanisms
+come from the live tree and selected platform appendix. In particular, Base
+“no `goto`” is house style only: Linux/BSP forward cleanup `goto` follows the
+tree and [c-quality.md](references/c-quality.md) / L1, not Base §5 dogma.
+
+---
+
+## Quality floor — all branches
+
+1. Read [c-quality.md](references/c-quality.md) before designing or reviewing C.
+2. Record the local dialect/toolchain, external representations, ownership and
+   cleanup, execution context, mutable sharing, and verification surface that
+   the changed region actually depends on.
+3. Resolve every Base or platform recommendation through those contracts.
+
+**Done when:** every changed boundary and risky operation is covered by the
+quality checklist, and no style rule changes behavior, ABI, representation,
+resource lifetime, or target legality.
 
 ---
 
@@ -39,13 +59,15 @@ Unclear ⇒ [classify-repo.md](references/classify-repo.md) defaults.
 
 ---
 
-## Branch HOST — call Base only
+## Branch HOST — apply Base through the quality floor
 
 1. Read [references/base/write-legible-c-SKILL.md](references/base/write-legible-c-SKILL.md) and [references/base/c-standard.md](references/base/c-standard.md) **§§1–14**.
 2. Load disclosed Base files only when their branch fires (greenfield → [skeleton.md](references/base/skeleton.md); short/flat → [near-miss-map-eat.md](references/base/near-miss-map-eat.md); repo guidance → [repository-level.md](references/base/repository-level.md)).
-3. Follow Base order and §14 end-to-end; deliver per **Deliver → HOST** below.
+3. Follow Base order and §14 end-to-end, treating incompatible Base rules as
+   explicit deviations under the constraint priority above.
 
-**Done when:** Base §14 is applied to the final diff (or each forced deviation has a source-site comment), and HOST Deliver gates pass.
+**Done when:** the quality checklist and Base §14 are applied to the final
+diff, and each forced deviation is precise and locally visible where needed.
 
 If mid-task you hit nested-kernel files, switch remaining work to **EMBEDDED**.
 
@@ -75,10 +97,13 @@ blocks (see Deliver).
 
 | Path Class | Load |
 |------------|------|
-| ORCH | Base [c-standard.md](references/base/c-standard.md) §4–8, §14; near-miss file when code already short/flat |
-| HOT | [hot-rules.md](references/hot-rules.md) **first**; Base only where HOT does not override |
-| BOUND | Base adapter altitude; thin foreign wrap only |
-| DRIVER | Host tree style first; Base supplement; **required** L1 when known: [linux](references/platforms/linux.md) / [zephyr](references/platforms/zephyr.md) / [rt-thread](references/platforms/rt-thread.md) |
+| ORCH | Quality floor → Base [c-standard.md](references/base/c-standard.md) §4–8, §14 where compatible; near-miss file when code already short/flat |
+| HOT | Quality floor → [hot-rules.md](references/hot-rules.md) → selected L1/concurrency refs when triggered; Base only where HOT does not override |
+| BOUND | Quality floor → thin foreign adapter; Base adapter altitude only where compatible |
+| DRIVER | Quality floor → host tree + **required** L1 when known: [linux](references/platforms/linux.md) / [zephyr](references/platforms/zephyr.md) / [rt-thread](references/platforms/rt-thread.md); Base supplement only |
+
+For **HOT**, always read `c-quality.md` before `hot-rules.md`; then load the
+selected L1 and `concurrency-memory.md` when their triggers fire.
 
 Linux L1 is the deep profile; Zephyr/RT-Thread are thinner. Bare-metal /
 unlisted RTOS: Path Class + HOT + the BSP’s own rules.
@@ -86,16 +111,17 @@ unlisted RTOS: Path Class + HOT + the BSP’s own rules.
 Cross-context, lock/mask, or alloc/release ⇒ read
 [concurrency-memory.md](references/concurrency-memory.md) before editing.
 
-**Done when:** override set explicit (HOT ⇒ H1–H6); needed L1 + concurrency
-refs loaded.
+**Done when:** the quality floor is loaded for every Path Class, the HOT order
+is preserved, and needed L1 + concurrency refs are loaded.
 
 ### 4. Design then edit
 
 **Draft Classification first** (short OK): template
 [classify-repo.md](references/classify-repo.md). Then edit.
 
-Point APIs and sync at **tree + L1**; do not invent. Concurrency work ⇒ ban
-list + checklist in concurrency-memory.
+Point APIs and sync at **tree + L1**. Concurrency work ⇒ ban list + checklist
+in concurrency-memory. Apply the quality floor to integer operations,
+representation, ownership, cleanup, and public boundaries before reshaping code.
 
 | Class | Edit rule |
 |-------|-----------|
@@ -111,6 +137,8 @@ Source comments: non-obvious hardware/context only, host style.
 ### 5. Verify
 
 - **Classification gate:** complete per Deliver; incomplete ⇒ do not ship code-only.
+- **Quality gate:** [c-quality.md](references/c-quality.md) checklist passes for
+  every changed boundary and risky operation.
 - HOT ⇒ H1–H6; missing H2/H6 record fields ⇒ those checks **fail**.
 - Shared state / lock / alloc ⇒ concurrency ban list + checklist (all pass).
 - ORCH/BOUND ⇒ Base §14 on those hunks.
@@ -126,54 +154,25 @@ named mechanisms cite tree (or *none — asked/blocked*).
 
 ### EMBEDDED — Classification record is mandatory
 
-No complete Classification record ⇒ EMBEDDED delivery **incomplete**, even if
-the diff looks correct. Same message as the code is fine; omission is not.
+Ship the exact, minimal Classification record defined in
+[classify-repo.md](references/classify-repo.md). One block covers each distinct
+edited Path Class × CTX; HOT blocks satisfy the record's call-note contract.
+An absent, blanket, or bloated record, or an unchecked/failed C quality
+checklist, makes EMBEDDED delivery incomplete.
 
-Template: [classify-repo.md](references/classify-repo.md).
+Also report behavior change, structure, quality/platform deviations, and
+verification (checklists + build/tests status).
 
-**Required fields every region block:** Branch, Active Git Root, Repo Kind,
-Platform, Path Class, CTX, Governing rules. Keyword notes optional.
+### HOST — Quality checklist and Base §14 are fail-closed
 
-**Region scope (minimal):** only **edited** entry paths / coherent hunks. One
-block per distinct **Path Class × CTX** in the diff — not per function, and
-**not** for unchanged helpers you only call. Typical ISR + deferred + thread
-edit ⇒ about **three** blocks. Extra pure-noise blocks (same Path×CTX, or
-untouched callees) should be **trimmed**. Details:
-[classify-repo.md](references/classify-repo.md).
-
-**Multi-region gate:** more than one Path Class or CTX among edited regions ⇒
-**separate blocks**. One blanket `DRIVER`/`Thread` for mixed IRQ and process
-code **fails**.
-
-**HOT notes:** Path Class **HOT** ⇒ `HOT call notes` is either `none` or
-`call site → why not deferred / latency bound source` lines. Omitted ⇒ gate
-and H2/H6 **fail**. Non-HOT blocks: **omit** the field (no `n/a` filler).
-
-**Order:** draft record → edit → re-check record → ship record + code together.
-
-Also: behavior change; structure; deviations; verification (checklists +
-build/tests status).
-
-### HOST — Base §14 is fail-closed
-
-HOST delivery is **incomplete** unless [c-standard.md](references/base/c-standard.md)
-**§14** is applied to the final diff item-by-item (pass / deviation with
-**source-site** comment). A code-only reply or a vague “looks clean” note
-**fails** this gate. Prefer an explicit §14 checklist in the delivery message
-(same pattern as Base skill deliver).
-
-**`MODULE_TRY` (Base §9):** when the module defines a status enum (success = 0)
-and you add or edit a **non-acquiring** orchestrator (no `_create` / `_init` /
-`_open` / `alloc` / other acquire in that function body), define a module
-`FOO_TRY` (or `MODULE_TRY`) beside the status enum and use it for fallible
-propagation in that orchestrator — see Base §9 and
-[skeleton.md](references/base/skeleton.md). Do **not** invent a second
-status-propagation protocol. Do **not** require TRY on acquiring functions
-(explicit check + release) or on EMBEDDED HOT/IRQ paths (Overlay / tree win).
-
-Also report: behavior change; structure (orchestrator / leaf / adapter); §14
-verification; deviations. Classification optional unless you entered
-nested-kernel files (then finish under EMBEDDED).
+HOST delivery is **incomplete** unless both the
+[C quality checklist](references/c-quality.md#pre-delivery-checklist) and Base
+[§14](references/base/c-standard.md#14-pre-delivery-checklist) are applied
+item-by-item to the final diff. Report each item as pass or a precise deviation;
+a code-only or vague verification note fails this gate. Apply Base §9
+`MODULE_TRY` only under its stated non-acquiring-orchestrator conditions. Also
+report behavior change, material structure, tests/builds, and deviations.
+Entering nested-kernel files switches delivery to EMBEDDED.
 
 ## Attribution
 

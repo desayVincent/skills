@@ -1,5 +1,5 @@
 interface:
   display_name: "Write Legible Embedded C"
-  short_description: "Linux/RTOS/BSP C, ISR and concurrency"
+  short_description: "Legible, context-correct host and embedded C"
 policy:
   allow_implicit_invocation: true
