@@ -11,144 +11,172 @@ metadata:
 
 # Write Legible Embedded C
 
-**Classify before styling.** One skill covers host userspace and embedded trees.
+**Classify before styling.** One skill for host userspace and embedded trees.
 Base is vendored under [references/base/](references/base/); no second skill install.
-
-Internally it uses two layers:
 
 | Layer | Where | When |
 |-------|--------|------|
-| **Base** | [references/base/](references/base/) (vendored [write-legible-c](https://github.com/7etsuo/write-legible-c), MIT / 7etsuo) | Host userspace, Super SDK ORCH, any Path Class that does not override |
+| **Base** | [references/base/](references/base/) (vendored [write-legible-c](https://github.com/7etsuo/write-legible-c), MIT / 7etsuo) | HOST; Super SDK ORCH; Path Class that does not override |
 | **Overlay** | This file + [references/](references/) (except `base/`) | Nested kernel/BSP, DRIVER, HOT/ISR, platform appendices |
 
-**Constraint priority:** governing tree and subsystem rules, ABI/binding or
-generated-source requirements, execution-context/latency/safety/size limits ≥
-Overlay ≥ Base.
-
-**Classify before styling.** The active tree and execution context decide which
-rules apply. Base rules improve legibility only where they do not conflict with
-the code's real kernel, BSP, RTOS, or interface constraints. The live tree is the
-external single source of truth; this skill points at it and requires the agent
-to consult it — never invent a “common” locking, allocator, or ISR pattern in
-place of the tree’s actual contract (**prior contamination** defence).
+**Constraint priority:** tree / subsystem / ABI / latency / safety / size ≥
+Overlay ≥ Base. Mechanisms come from the **live tree** (and L1 appendix when
+known), not from pretrained “common” patterns — see
+[concurrency-memory.md](references/concurrency-memory.md) ban list (PC1–PC8).
 
 ---
 
 ## Step 0 — Pick the branch
 
-**Done when:** you have chosen exactly one branch: **HOST** or **EMBEDDED**.
+**Done when:** exactly one of **HOST** or **EMBEDDED**.
 
 | Branch | Choose when |
 |--------|-------------|
-| **HOST** | Pure host userspace C; or Super SDK code with no nested-kernel Active Git Root and no ISR/driver/HOT intent |
+| **HOST** | Pure host userspace C; or Super SDK with no nested-kernel Active Git Root and no ISR/driver/HOT intent |
 | **EMBEDDED** | Nested Kernel/BSP Active Git Root; Linux/Zephyr/RT-Thread/BSP drivers; ISR/Deferred; Path Class HOT/DRIVER; or user says embedded/kernel/RTOS |
 
-If the branch is unclear, open [classify-repo.md](references/classify-repo.md) and use its defaults.
+Unclear ⇒ [classify-repo.md](references/classify-repo.md) defaults.
 
 ---
 
 ## Branch HOST — call Base only
 
-Run the Base procedure as if `write-legible-c` were invoked, using **this skill’s copies** (do not depend on a separate installed skill):
+1. Read [references/base/write-legible-c-SKILL.md](references/base/write-legible-c-SKILL.md) and [references/base/c-standard.md](references/base/c-standard.md) **§§1–14**.
+2. Load disclosed Base files only when their branch fires (greenfield → [skeleton.md](references/base/skeleton.md); short/flat → [near-miss-map-eat.md](references/base/near-miss-map-eat.md); repo guidance → [repository-level.md](references/base/repository-level.md)).
+3. Follow Base order and §14 end-to-end; deliver per **Deliver → HOST** below.
 
-1. Read [references/base/write-legible-c-SKILL.md](references/base/write-legible-c-SKILL.md) and [references/base/c-standard.md](references/base/c-standard.md) **§§1–14** (normative rules + §14 gate).
-2. Load Base disclosed files only when their branch fires (greenfield → [skeleton.md](references/base/skeleton.md); short/flat existing code → [near-miss-map-eat.md](references/base/near-miss-map-eat.md); repo guidance → [repository-level.md](references/base/repository-level.md)).
-3. Follow Base “Work in this order” and Base §14 end-to-end.
-4. Deliver as Base specifies.
+**Done when:** Base §14 is applied to the final diff (or each forced deviation has a source-site comment), and HOST Deliver gates pass.
 
-**Done when:** Base §14 is fully applied to the final diff (or deviations commented at site).
-
-No Path Class / HOT rules on this branch unless mid-task you discover nested-kernel files—then switch the remaining files to **EMBEDDED**.
+If mid-task you hit nested-kernel files, switch remaining work to **EMBEDDED**.
 
 ---
 
-## Branch EMBEDDED — Hard Order (then Base where allowed)
+## Branch EMBEDDED — Hard Order
 
-Do not apply Base **15/40 line budgets** until Path Class is known.
+Do **not** apply Base **15/40** until Path Class is known.
 
 ### 1. Classify Active Git Root
 
-Follow [references/classify-repo.md](references/classify-repo.md).
+Follow [classify-repo.md](references/classify-repo.md).
 
-**Done when:** each touched file has Active Git Root, Repo Kind (Super SDK vs
-Nested Kernel/BSP), platform if known, and the local rules/build files that
-govern it. Root beats keywords; on conflict ask or take Root.
+**Done when:** each touched file has Active Git Root, Repo Kind, platform if
+known, and governing local rules/build files. Root beats keywords.
 
-### 2. Assign Path Class and Execution Context
+### 2. Assign Path Class and CTX
 
-Follow [references/path-class.md](references/path-class.md).
+Follow [path-class.md](references/path-class.md).
 
 **Done when:** each region has Path Class ∈ {ORCH, HOT, BOUND, DRIVER} and
-CTX ∈ {ISR, Deferred, Thread, Init} (or N/A), with its entry path, ownership,
-and synchronization or MMIO mechanism **named** and tied to a header or nearby
-in-tree precedent that establishes the required pattern. Defaults: Nested
-Kernel/BSP → DRIVER (ISR/fast → HOT); Super SDK → ORCH. “I judged it appropriate”
-is not enough; cite the local source of the mechanism.
+CTX ∈ {ISR, Deferred, Thread, Init, N/A}. Defaults: Nested Kernel/BSP → DRIVER
+(ISR/fast → HOT); Super SDK → ORCH. Mixed Path/CTX ⇒ **multiple** Classification
+blocks (see Deliver).
 
 ### 3. Load rules
 
 | Path Class | Load |
 |------------|------|
-| ORCH | Base ([c-standard.md](references/base/c-standard.md) §4–8, §14; near-miss → [near-miss-map-eat.md](references/base/near-miss-map-eat.md) when code already looks short/flat) |
+| ORCH | Base [c-standard.md](references/base/c-standard.md) §4–8, §14; near-miss file when code already short/flat |
 | HOT | [hot-rules.md](references/hot-rules.md) **first**; Base only where HOT does not override |
 | BOUND | Base adapter altitude; thin foreign wrap only |
-| DRIVER | Host style first; Base supplement; **required** platform appendix when known: [platforms/linux.md](references/platforms/linux.md), [platforms/zephyr.md](references/platforms/zephyr.md), or [platforms/rt-thread.md](references/platforms/rt-thread.md) |
+| DRIVER | Host tree style first; Base supplement; **required** L1 when known: [linux](references/platforms/linux.md) / [zephyr](references/platforms/zephyr.md) / [rt-thread](references/platforms/rt-thread.md) |
 
-Linux is the deep L1 profile; Zephyr and RT-Thread appendices are thinner
-conflict/decision tables unless expanded later. Bare-metal or unlisted RTOS:
-Path Class + HOT, plus the active BSP's own build/HAL/startup rules.
+Linux L1 is the deep profile; Zephyr/RT-Thread are thinner. Bare-metal /
+unlisted RTOS: Path Class + HOT + the BSP’s own rules.
 
-When code crosses contexts, shares mutable state, holds a lock or
-interrupt/scheduler mask, or allocates/releases memory, read
+Cross-context, lock/mask, or alloc/release ⇒ read
 [concurrency-memory.md](references/concurrency-memory.md) before editing.
 
-**Done when:** the override set is explicit (HOT ⇒ H1–H6), and any applicable
-platform and concurrency/memory reference has been read.
+**Done when:** override set explicit (HOT ⇒ H1–H6); needed L1 + concurrency
+refs loaded.
 
 ### 4. Design then edit
 
-Map the touched code before reshaping it: owner, entry path, execution context,
-state or resource lifetime, lock/atomic/MMIO boundary, held-lock calls,
-allocation and teardown path, and externally visible ABI or binding. Keep that
-map consistent with the active tree's nearby code. Prefer *context-legal*,
-*bounded*, and *quiesce* decisions taken from the tree over pretrained “common”
-patterns.
+**Draft Classification first** (short OK): template
+[classify-repo.md](references/classify-repo.md). Then edit.
 
-ORCH regions use the full Base orchestrator/leaf/adapter + name test. HOT code
-keeps a tight critical path; split only at a real concept, data boundary, or
-deferral boundary, rather than to satisfy Base 15/40 targets. Add a source
-comment only where a non-obvious hardware or context constraint needs to stay
-visible to the next editor.
+Point APIs and sync at **tree + L1**; do not invent. Concurrency work ⇒ ban
+list + checklist in concurrency-memory.
 
-**Done when:** every touched function matches the active class.
+| Class | Edit rule |
+|-------|-----------|
+| ORCH | Base orchestrator/leaf/adapter + §14 |
+| HOT | hot-rules H1–H6; split only concept / data / deferral boundary |
+| BOUND | Thin foreign wrap only |
+| DRIVER | Host style; Base supplements; L1 verification only |
+
+Source comments: non-obvious hardware/context only, host style.
+
+**Done when:** code matches each region’s class; draft record still matches code.
 
 ### 5. Verify
 
-- Fill the **Classification record** in
-  [classify-repo.md](references/classify-repo.md) (single home for Root, Kind,
-  Platform, Path Class, CTX, governing rules).
-- HOT ⇒ H1–H6 checklist in [hot-rules.md](references/hot-rules.md).
-- Shared state, lock, or allocation work ⇒ checklist in
-  [concurrency-memory.md](references/concurrency-memory.md).
+- **Classification gate:** complete per Deliver; incomplete ⇒ do not ship code-only.
+- HOT ⇒ H1–H6; missing H2/H6 record fields ⇒ those checks **fail**.
+- Shared state / lock / alloc ⇒ concurrency ban list + checklist (all pass).
 - ORCH/BOUND ⇒ Base §14 on those hunks.
-- Platform work ⇒ **only** the selected L1 appendix's verification section
-  (do not restate those rows here).
-- Run project build/tests when available; mark each check passed / failed /
-  not run with reason.
+- Platform ⇒ selected L1 verification section only.
+- Build/tests when available; mark passed / failed / not run + reason.
 
-**Done when:** the Classification record is complete for every touched region,
-every applicable checklist item is answered against the final diff, and every
-named lock/atomic/allocator/MMIO mechanism cites the header or nearby precedent
-that establishes it.
+**Done when:** Deliver gate passes; checklists answered against final diff;
+named mechanisms cite tree (or *none — asked/blocked*).
 
 ---
 
 ## Deliver
 
-Include the filled Classification record from
-[classify-repo.md](references/classify-repo.md). Then: behavior change;
-structure; deviations; verification.
+### EMBEDDED — Classification record is mandatory
+
+No complete Classification record ⇒ EMBEDDED delivery **incomplete**, even if
+the diff looks correct. Same message as the code is fine; omission is not.
+
+Template: [classify-repo.md](references/classify-repo.md).
+
+**Required fields every region block:** Branch, Active Git Root, Repo Kind,
+Platform, Path Class, CTX, Governing rules. Keyword notes optional.
+
+**Region scope (minimal):** only **edited** entry paths / coherent hunks. One
+block per distinct **Path Class × CTX** in the diff — not per function, and
+**not** for unchanged helpers you only call. Typical ISR + deferred + thread
+edit ⇒ about **three** blocks. Extra pure-noise blocks (same Path×CTX, or
+untouched callees) should be **trimmed**. Details:
+[classify-repo.md](references/classify-repo.md).
+
+**Multi-region gate:** more than one Path Class or CTX among edited regions ⇒
+**separate blocks**. One blanket `DRIVER`/`Thread` for mixed IRQ and process
+code **fails**.
+
+**HOT notes:** Path Class **HOT** ⇒ `HOT call notes` is either `none` or
+`call site → why not deferred / latency bound source` lines. Omitted ⇒ gate
+and H2/H6 **fail**. Non-HOT blocks: **omit** the field (no `n/a` filler).
+
+**Order:** draft record → edit → re-check record → ship record + code together.
+
+Also: behavior change; structure; deviations; verification (checklists +
+build/tests status).
+
+### HOST — Base §14 is fail-closed
+
+HOST delivery is **incomplete** unless [c-standard.md](references/base/c-standard.md)
+**§14** is applied to the final diff item-by-item (pass / deviation with
+**source-site** comment). A code-only reply or a vague “looks clean” note
+**fails** this gate. Prefer an explicit §14 checklist in the delivery message
+(same pattern as Base skill deliver).
+
+**`MODULE_TRY` (Base §9):** when the module defines a status enum (success = 0)
+and you add or edit a **non-acquiring** orchestrator (no `_create` / `_init` /
+`_open` / `alloc` / other acquire in that function body), define a module
+`FOO_TRY` (or `MODULE_TRY`) beside the status enum and use it for fallible
+propagation in that orchestrator — see Base §9 and
+[skeleton.md](references/base/skeleton.md). Do **not** invent a second
+status-propagation protocol. Do **not** require TRY on acquiring functions
+(explicit check + release) or on EMBEDDED HOT/IRQ paths (Overlay / tree win).
+
+Also report: behavior change; structure (orchestrator / leaf / adapter); §14
+verification; deviations. Classification optional unless you entered
+nested-kernel files (then finish under EMBEDDED).
 
 ## Attribution
 
-Base text under `references/base/` is **write-legible-c** by **7etsuo**, **MIT**. See [references/base/LICENSE](references/base/LICENSE) and `NOTICE` and `README.md` in this skill folder. Overlay rules outside `base/` are team work.
+Base under `references/base/` is **write-legible-c** by **7etsuo**, **MIT**.
+See [references/base/LICENSE](references/base/LICENSE), `NOTICE`, and `README.md`.
+Overlay outside `base/` is team work.

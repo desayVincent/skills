@@ -6,14 +6,14 @@ Single skill for **host userspace C** and **embedded/kernel/BSP C** (Linux, Zeph
 
 | Branch | Behavior |
 |--------|----------|
-| **HOST** | Vendored Base (`references/base/` = write-legible-c) |
+| **HOST** | Vendored Base (`references/base/` = write-legible-c); §14 fail-closed; `MODULE_TRY` on non-acquiring orchestrators (Base §9) |
 | **EMBEDDED** | Hard Order: Active Git Root → Path Class → HOT / DRIVER / ORCH |
 
 **L1 platforms:** Linux appendix is the deep profile; Zephyr/RT-Thread are thinner decision tables by design.
 
 **Base packaging:** normative rules live in `references/base/c-standard.md` §§1–14; examples and provenance are disclosed beside it (same MIT text, progressive disclosure only).
 
-**Classification record:** fill the template in `references/classify-repo.md` on every EMBEDDED (and when useful HOST) delivery — that is the artifact for Path/CTX (not mandatory in-tree `/* PATH */` comments).
+**Classification record:** mandatory on every EMBEDDED delivery (multi-region when Path/CTX differ; HOT requires `HOT call notes`). Template: `references/classify-repo.md`. Incomplete record ⇒ incomplete delivery. Not satisfied by in-tree `/* PATH */` comments alone.
 
 ## Layout
 

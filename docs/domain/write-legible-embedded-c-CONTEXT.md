@@ -11,6 +11,7 @@ contextType: "general"
 |---|---|
 | Base Standard | marketplace 安装的 `write-legible-c` 及其 `c-standard.md`；通用 C11 机读纪律，默认不修改上游正文。 |
 | Embedded Overlay | 叠在 Base 之上的嵌入式规则；与 Base 同属 skill `write-legible-embedded-c`（HOST 调 Base，EMBEDDED 走 Hard Order）。Base 正文仍为 7etsuo 原作，置于 references/base/。 |
+| HOST Deliver gate | HOST 交付 fail-closed：必须对最终 diff 逐项应用 Base `c-standard.md` §14（通过或源码点偏差注释）；仅有代码或「看起来干净」不算完成。模块有 status 枚举且编辑**非获取** orchestrator 时，按 Base §9 使用 `MODULE_TRY`/`FOO_TRY`（不新造协议；不用于获取函数或 HOT/IRQ）。见 SKILL.md Deliver → HOST。 |
 | Constraint Priority | 规则冲突时的优先级：平台/实时/体积/冻结 SDK API ≥ Embedded Overlay ≥ Base Standard。偏差必须在源码偏差点注释说明约束。 |
 | Execution Context | 代码运行的调度环境，跨 Linux / RT-Thread / Zephyr 统一抽象。取值：ISR、Deferred、Thread、Init。决定可睡性、锁/同步原语、能否阻塞。 |
 | ISR | 硬中断或必须极短、通常不可睡眠的中断上下文（含需同等约束的上半部）。 |
@@ -22,9 +23,10 @@ contextType: "general"
 | HOT | 热路径档：禁止仅为行数强拆；允许单 leaf 偏长；每个调用按时延、栈与上下文证明合理；仍约束嵌套、副作用与共享数据纪律。用于 ISR 与极紧 fast path。 |
 | BOUND | 边界档：薄 adapter 对接冻结的 Vendor/SDK/内核公共 API；不重写对方实现。 |
 | DRIVER | 驱动树档：宿主树风格优先（如 Linux kernel coding style、Zephyr 惯例）；Base Standard 作补充而非压过宿主。 |
-| HOT Rules (H1–H6) | ISR∩HOT 的硬规则集：H1 关闭 15/40 行数目标；H2 每个调用按时延、栈、锁与延后策略证明合理，而非机械地要求零调用；H3 能延后必须延后；H4 跨上下文共享数据须明确读写者、同步与内存序（`volatile` 不能代替并发同步）；H5 只做当前上下文允许的操作；H6 在交付/审查记录中保留 PATH/CTX，源码仅为不明显约束添加注释。 |
-| Overlay Doc Layers | Overlay 文档切分：L0 正文（两轴、优先级、H1–H6、BOUND/ORCH/DRIVER 与仓库类型通则，每次必读）；L1 平台附录 = **平台决策与验证清单**（按平台加载）：可含本地契约、接口/并发/MMIO、以及 verification 行——**不是**“仅冲突对照表”。**Linux 为深度 L1 样板**；Zephyr/RT-Thread 可为较薄决策表，属声明过的不对称，不为对称硬编。L2 不进 skill（完整内核/API 手册，查官方文档）。 |
-| Classification record | 交付/审查时的唯一分类产物，模板在 `references/classify-repo.md`。必填 Branch、Active Git Root、Repo Kind、Platform、Path Class、CTX、Governing rules；HOT 时填 HOT call notes。Step 5、H6、path-class 均指向此模板，而非源码里的 `/* PATH */` 标记。 |
+| HOT Rules (H1–H6) | HOT 门禁：H1 关 Base 15/40；H2/H6 与 Classification 的 Path Class/CTX/HOT call notes **字段绑定（缺则失败）**；H3–H5 各一行决策，细节指向树与 concurrency ban list，不重讲驱动写法。 |
+| Overlay Doc Layers | L0 = 分支/Hard Order/交付门禁 + H1–H6 字段耦合 + PC 禁区（**gate，非驱动教程**）；L1 = 平台**特有**所有权与验证（指针到树/并发/HOT，不重讲通用 ISR/锁课）。**Linux L1 仍可更深**；Zephyr/RT-Thread 更薄。L2 不进 skill。 |
+| Classification record | 交付/审查时的唯一分类产物，模板在 `references/classify-repo.md`。必填 Branch、Active Git Root、Repo Kind、Platform、Path Class、CTX、Governing rules；HOT 时 **HOT call notes 必填**（`none` 或 `call → reason`），非 HOT **省略该字段**（禁止 `n/a` 填充）。仅覆盖**本次编辑**的 entry/hunk；按 Path×CTX 合并，禁止为未改 helper 滥增 region。Path/CTX 不同须多 region；缺 record 或字段 ⇒ fail-closed。 |
+| Prior-contamination ban list | `concurrency-memory.md` 中 PC1–PC8 可勾选禁止项（自造 portable sync/reactor、`volatile` 当同步、ISR 堆分配/睡眠、无树依据的零调用教条、绕过 MMIO accessor、仅凭 common practice 选型等）；未全部通过则并发门禁失败。 |
 | Super SDK Repo | 顶层大 git 仓库：产品/SDK 主体。工作树内可**嵌套**其它 git 仓库（子模块或嵌套 clone）。 |
 | Nested Kernel/BSP Repo | 位于 Super SDK 工作树某路径下的嵌套 git 仓（如 Linux/BSP 路径）：内核、驱动、中断、线程、板级与硬件紧耦合代码。 |
 | Repo Kind | 推断第一刀：当前文件落在**哪一个 Active Git Root**——在 Super SDK 根下且不在嵌套内核仓内 → SDK 姿态；在 Nested Kernel/BSP 根内 → 内核/BSP 姿态。 |

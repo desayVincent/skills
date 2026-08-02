@@ -40,9 +40,30 @@ Rules:
 
 ## Classification record (template)
 
-**Single home** for delivery/review classification. Step 5, H6, and
-[path-class.md](path-class.md) all point here. Fill one block per coherent
-edit (or one block per region if Path/CTX differ).
+**Single home** for delivery/review classification. EMBEDDED Deliver (SKILL.md),
+Step 5, H2/H6, and [path-class.md](path-class.md) all point here.
+
+### Region scope (minimal, fail bloat)
+
+- Emit blocks only for **regions you edit** (entry points / callbacks / coherent
+  hunks in the diff). Do **not** invent a block for an unchanged tree helper
+  you only *call* (e.g. existing drop stats, logging, shared library).
+- **One block per distinct (Path Class × CTX)** among those edited regions —
+  not one block per function when several share the same class and context.
+- Prefer the **smallest** set that still separates mixed Path/CTX (e.g. IRQ +
+  Deferred + Thread → typically **3** blocks, not 5+).
+
+**Multi-region gate:** mixed Path Class or CTX under one blanket class **fails**.
+**Anti-bloat:** extra blocks that do not correspond to edited code, or duplicate
+the same Path×CTX without a distinct entry path, are **noise** (trim them).
+
+### HOT call notes field
+
+- Path Class **HOT:** field is **mandatory** — `none` or
+  `call site → why not deferred / latency bound source` lines. Omitted ⇒ H2/H6
+  **fail**.
+- Path Class **not HOT:** **omit** the field entirely. Do **not** write
+  `n/a`, `none`, or filler notes on non-HOT blocks.
 
 ```
 Branch: HOST | EMBEDDED
@@ -51,10 +72,10 @@ Repo Kind: Super SDK | Nested Kernel/BSP
 Platform: linux | zephyr | rt-thread | bare-metal | unknown
 Path Class: ORCH | HOT | BOUND | DRIVER
 Execution Context (CTX): ISR | Deferred | Thread | Init | N/A
-Governing rules: <tree style / Kconfig owner / ABI / binding — short>
+Governing rules: <tree style / Kconfig owner / ABI — short; file paths OK>
 Keyword notes: <optional>
-HOT call notes (if Path Class = HOT): <call site → why not deferred / latency bound source>
+HOT call notes: <only if Path Class = HOT: none | call → reason lines>
 ```
 
-**Done when:** every field above is filled for each region you change (HOT call
-notes may be `none` if there are no non-trivial HOT calls).
+**Done when:** required fields filled for each **edited** region; HOT blocks
+have valid `HOT call notes`; non-HOT blocks omit that field; no bloat regions.

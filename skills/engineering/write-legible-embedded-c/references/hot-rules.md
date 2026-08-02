@@ -1,65 +1,62 @@
 # HOT rules (H1–H6)
 
-Apply when **Path Class = HOT** (typically **CTX = ISR** or an explicit fast path). These override Base Standard line-count and “split for cleanliness” pressure.
+Apply when **Path Class = HOT** (typically **CTX = ISR** or an explicit fast path).
+Overrides Base **15/40** and “split for cleanliness.”
 
-Prefer the tree’s existing *bounded*, *context-legal* patterns. Do not invent a
-zero-call budget, lock style, or deferral shape that the host tree does not use
-(**prior contamination** defence).
+Do not invent zero-call budgets, lock styles, or deferral shapes the tree does
+not use — [concurrency-memory.md](concurrency-memory.md) ban list.
+
+**Record coupling:** H2 and H6 are verified **only** against the Classification
+record in [classify-repo.md](classify-repo.md). Missing required fields ⇒ those
+checks **fail** (fail-closed).
 
 ## H1 — Line budget off
 
-Base **target 15 / hard 40** do **not** force splits on HOT. Nesting still prefer ≤2. Split only for a real concept, shared data boundary, or required deferral—not for line count.
+Base 15/40 does **not** force HOT splits. Nesting still prefer ≤2. Split only
+for a real concept, shared-data boundary, or required deferral.
 
-## H2 — Call budget follows the latency contract
+## H2 — Calls ↔ record field `HOT call notes`
 
-Treat each call on the HOT path as a latency, stack, locking, and deferral
-decision. Prefer the tree's existing inline or leaf patterns for simple
-register access. Do not invent a zero-call budget that the host tree does not
-use.
+Each non-trivial HOT call is a latency/stack/lock/deferral decision; cite the
+tree, do not invent a zero-call budget.
 
-**Checkable product:** list every non-trivial HOT call in the Classification
-record **HOT call notes** field
-([classify-repo.md](classify-repo.md)) as
-`call site → why not deferred / latency bound source`. Use `none` when there
-are no such calls. A non-obvious hard-IRQ exception may also get a source-site
-reason in host style.
+| Record field | Required content |
+|--------------|------------------|
+| **HOT call notes** | `call site → why not deferred / latency bound source` per call; or exactly `none` |
+
+**Fail:** HOT region and field missing, blank, vague prose, or not `none` / `→` lines.
 
 ## H3 — Defer when possible
 
-HOT does: ack hardware, minimal state, schedule **Deferred** / Thread work. Business logic belongs outside ISR.
+Business work off HOT; use the **tree’s** deferred primitive (name from tree/L1).
+See PC2 if tempted to invent a reactor.
 
-## H4 — Shared data and ordering explicit
+## H4 — Shared data explicit
 
-For every datum shared across HOT, Deferred, or Thread context, identify the
-writer, reader, context, and synchronization mechanism. Use the platform's
-MMIO accessor for device registers; use the tree's lock, atomic, IRQ-safe
-critical section, `READ_ONCE`/`WRITE_ONCE`, or documented memory-ordering
-primitive for normal shared state. `volatile` is not a generic synchronization
-or ordering mechanism; use it only where the platform interface requires it.
-Name the primitive and the header or nearby precedent that establishes it.
+Cross-context datum ⇒ named tree sync + citation (or *none — asked/blocked*).
+Details: PC3/PC7 and concurrency checklist — not retaught here.
 
-## H5 — Context-legal work only
+## H5 — Context-legal only
 
-Apply the [concurrency and memory contract](concurrency-memory.md). Use only
-operations legal in the active execution context. Keep waits and lock hold time
-*bounded*; move work whose latency or sleepability cannot be justified to
-Deferred or Thread context. A documented platform exception gets a source-site
-comment that names the constraint and its source in the tree.
+Only operations legal in this CTX; *bounded* hold/latency. Unjustified sleep or
+work ⇒ Deferred/Thread. Full gate: [concurrency-memory.md](concurrency-memory.md).
 
-## H6 — Record the path
+## H6 — Record the path ↔ `Path Class`, `CTX`, `HOT call notes`
 
-Record HOT/CTX in the Classification record template in
-[classify-repo.md](classify-repo.md) (fields **Path Class**, **CTX**, and when
-applicable **HOT call notes**). That is the verification target for H6.
+| Record field | Required when Path Class = HOT |
+|--------------|--------------------------------|
+| **Path Class** | `HOT` |
+| **CTX** | Filled (typically `ISR`); not blank |
+| **HOT call notes** | Same rule as H2 |
 
-Add a source comment only when the context constraint is not obvious from the
-entry point, locking, or platform API; follow the host tree's comment style.
+**Fail:** any of the three missing/blank, or H2 content rule failed.  
+No invented `/* PATH: HOT */` unless the host tree already uses that convention.
 
 ## HOT checklist (pre-delivery)
 
-- [ ] H1: no split done only for Base 15/40
-- [ ] H2: every non-trivial HOT call is listed in Classification record **HOT call notes** as `call site → why not deferred / latency bound source` (or `none`)
-- [ ] H3: nothing deferrable left in ISR without reason
-- [ ] H4: every cross-context datum has an explicit synchronization and ordering story, with the primitive cited to the tree
-- [ ] H5: every operation is *context-legal* for the active context, with *bounded* hold/latency evidence
-- [ ] H6: Path Class + CTX filled in Classification record; non-obvious source constraints documented
+- [ ] **H1:** no split only for Base 15/40
+- [ ] **H2:** **HOT call notes** valid — *field missing ⇒ fail*
+- [ ] **H3:** deferrable work not left on HOT without reason; deferred API from tree
+- [ ] **H4:** cross-context sync named + tree-cited
+- [ ] **H5:** context-legal + *bounded*; concurrency gate passes
+- [ ] **H6:** **Path Class** + **CTX** + **HOT call notes** — *any missing ⇒ fail*

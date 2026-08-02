@@ -35,11 +35,10 @@ Which legibility regime applies:
 
 ## Classification record
 
-Record **Path Class** and **Execution Context** in the Classification record
-template in [classify-repo.md](classify-repo.md). That template is the only
-required artifact for “classification recorded.”
+Record **Path Class** and **CTX** in [classify-repo.md](classify-repo.md) —
+the only required artifact for “classification recorded.” EMBEDDED: multi-region
+(minimal: edited Path×CTX only), HOT `HOT call notes` required / non-HOT omit,
+fail-closed per SKILL.md Deliver.
 
-Add a source comment only when the context is not evident from the entry point,
-locking, or platform API, and follow the host tree's comment style (DRIVER does
-not invent non-tree markers such as `/* PATH: HOT */` unless the tree already
-uses an equivalent convention).
+Source comments only when context is not evident from entry/locking/API; host
+style (no invented `/* PATH: HOT */` unless the tree already uses that).

@@ -1,59 +1,50 @@
 # L1 appendix: RT-Thread kernel and BSP
 
-Load for a Nested Kernel/BSP tree with platform **rt-thread** before designing
-or reviewing an RT-Thread driver, BSP/board port, SCons/Kconfig, component,
-interrupt, IPC, MMIO, DMA, startup, or power-management change. The active
-RT-Thread tree, BSP, and vendor HAL remain authoritative.
+Load for Nested Kernel/BSP platform **rt-thread**. Tree, BSP, and vendor HAL win.
+Cross-context gates: [concurrency-memory.md](../concurrency-memory.md). HOT:
+[hot-rules.md](../hot-rules.md). Not a generic ISR tutorial.
 
-## Establish the local contract
+## Local contract
 
-Read the nearest repository guidance, touched headers and callers, the active
-BSP's `Kconfig`, `SConstruct`/`SConscript`, `rtconfig.py`, board startup files,
-and a nearby in-tree driver or BSP exemplar. Identify whether `rtconfig.h` or
-other files are generated and which toolchain/profile owns them.
+Know: active BSP, SCons/Kconfig/`rtconfig.py` owner, init path, vendor/HAL
+boundary, toolchain. Do not invent board, compiler prefix, memory map, clocks,
+or generated config.
 
-**Done when:** the active BSP, build owner, configuration symbol, init path,
-vendor/HAL boundary, and documented toolchain are known. Do not infer a board,
-compiler prefix, memory map, clock tree, or generated configuration.
-
-## Preserve RT-Thread ownership and interfaces
+## RT-Thread-specific ownership (keep)
 
 | Concern | Required decision |
 |---|---|
-| Style and local idiom | RT-Thread, BSP, component, and vendor HAL conventions win over Base formatting or decomposition rules. |
-| Object lifetime | Preserve static `init`/`detach` versus dynamic `create`/`delete` ownership pairs and their failure/unwind paths. |
-| Device framework | Keep device registration, operations tables, open flags, callbacks, and component boundaries compatible with existing users. |
-| Init ordering | Preserve the tree's board/component initialization phase and export-macro ordering; make dependencies explicit rather than shifting init priority casually. |
-| SCons and Kconfig | Keep source groups, include paths, dependency conditions, generated config, packages, and feature selection aligned. |
-| Vendor or exported API | Classify HAL, package, component, and frozen application-facing boundaries as BOUND; adapt locally rather than rewriting foreign code for Base aesthetics. |
+| Style / idiom | RT-Thread, BSP, component, vendor HAL conventions over Base |
+| Object lifetime | Static `init`/`detach` vs dynamic `create`/`delete` pairs + failure unwind |
+| Device framework | Registration, ops tables, open flags, callbacks, component boundaries |
+| Init ordering | Board/component init phase and export-macro order; explicit deps |
+| SCons / Kconfig | Source groups, includes, deps, generated config, packages, features |
+| Vendor / exported API | BOUND; adapt locally, do not rewrite HAL for Base aesthetics |
 
-## Context, concurrency, and I/O
+## RT-Thread-specific mechanism pointers
 
-Apply the cross-platform [concurrency and memory contract](../concurrency-memory.md),
-then make these RT-Thread-specific decisions:
+Generic concurrency/HOT elsewhere. Choose **RTT/BSP** primitives from tree:
 
-| Concern | Required decision |
+| Concern | Point at tree / choose |
 |---|---|
-| Execution context | Identify ISR, deferred worker/timer, thread, scheduler-locked critical section, init, and PM paths. Prove API legality and wait behavior from that context. |
-| Interrupt entry/exit | Preserve architecture/BSP-required interrupt enter/leave and nesting semantics. Apply [HOT H1–H6](../hot-rules.md) to the hard path. |
-| Locking, scheduling, and IPC | Select the interrupt lock, critical section, spinlock/SMP primitive, atomic, semaphore/event/mailbox/queue, or ownership rule from the actual sharing contexts. Treat scheduler locking as scheduling control; add the ISR/SMP protection required by the active port. Preserve timeout and lock-order semantics. |
-| Allocation and release | Preserve static `init/detach` and dynamic `create/delete` ownership. Prefer static objects or fixed pools for ISR and bounded paths. Prove `rt_malloc/rt_free`, object creation/deletion, and pool API legality from the active RT-Thread version, configuration, and port. Quiesce interrupts, timers, threads, IPC waiters, DMA, callbacks, and device users before detach, delete, or free. |
-| MMIO and registers | Reuse the BSP/HAL register abstraction and preserve access width, ordering, volatile hardware semantics, clocks, resets, and pinmux ownership. |
-| DMA and cache visibility | Name buffer ownership, alignment, direction, cache clean/invalidate operation, and completion handoff required by the BSP/HAL contract. |
+| CTX labels | ISR, deferred worker/timer, thread, scheduler-locked section, init, PM |
+| IRQ enter/leave | Arch/BSP required enter/leave and nesting; HOT on hard path |
+| Sync / IPC | Interrupt lock, critical section, spinlock/SMP, atomic, sem/event/mbox/queue as shared CTXs require |
+| Alloc | Static/pool on bounded paths; prove `rt_malloc`/object/pool legality + *quiesce* before detach/delete/free |
+| MMIO | BSP/HAL register abstraction; width, order, clocks, resets, pinmux ownership |
+| DMA | ownership, align, direction, cache clean/invalidate, completion handoff |
 
 ## Verification matrix
 
-Use the active BSP's documented SCons/IDE generation command, configuration,
-toolchain, linker script, and runtime path.
+BSP SCons/IDE, config, toolchain, linker, runtime path.
 
 | Diff includes | Verify when available |
 |---|---|
-| Kernel, driver, component, or BSP C | Build the active BSP/configuration and confirm the changed object is selected and linked. |
-| Kconfig, SConscript, or package metadata | Regenerate configuration where the project requires it, then build with the changed feature enabled and inspect dependency/source-selection failures. |
-| Startup, linker, clock, pin, or memory map | Inspect the generated map/image and run the board's documented bring-up check. |
-| Shared component behavior | Run the narrowest relevant utest, sample, shell command, simulator, or project-specific test. |
-| Runtime or hardware behavior | Exercise the documented board path and capture the relevant console or trace evidence. Report unavailable hardware/toolchain/configuration and the remaining risk. |
+| Kernel/driver/component/BSP C | Build active BSP/config; object selected and linked |
+| Kconfig/SConscript/package | Regenerate config if required; build with feature on |
+| Startup/linker/clock/pin/map | Map/image + board bring-up check |
+| Shared behavior | Narrowest utest/sample/shell/sim/project test |
+| Runtime | Documented board path; report unavailable hw/toolchain |
 
-**Done when:** every relevant row is passed, deliberately deferred with a
-reason, or reported unavailable. A generic host build does not prove an
-RT-Thread BSP image.
+**Done when:** relevant rows passed, deferred with reason, or unavailable.
+Generic host build ≠ RT-Thread BSP image proof.
