@@ -1,5 +1,5 @@
 interface:
   display_name: "Write Legible Embedded C"
-  short_description: "Legible, context-correct host and embedded C"
+  short_description: "HOST|EMBEDDED C write and review"
 policy:
   allow_implicit_invocation: true

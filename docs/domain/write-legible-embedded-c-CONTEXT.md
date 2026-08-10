@@ -1,38 +1,35 @@
 ---
 title: "Context: Write-Legible Embedded C"
-description: "嵌入式 C 机读规范（覆盖 write-legible-c）的领域术语。"
+description: "write-legible-embedded-c 领域术语索引；规范正文在 skill 内。"
 importance_tier: "normal"
 contextType: "general"
 ---
 
-# 领域上下文
+# 领域上下文（索引）
 
-| 术语 | 本项目中的定义 |
+**规范只在 skill 内。** 本文件是人类/agent 的术语索引，不重复 checklist、门禁或默认矩阵。改行为时只改右侧权威文件。
+
+Skill 根目录：[`skills/engineering/write-legible-embedded-c/`](../../skills/engineering/write-legible-embedded-c/)
+
+| 术语 | 权威位置 |
 |---|---|
-| Base Standard | marketplace 安装的 `write-legible-c` 及其 `c-standard.md`；通用 C11 机读纪律，默认不修改上游正文。 |
-| C Quality Floor | HOST 与 EMBEDDED 都先读的 C 语义底线，位于 `references/c-quality.md`。它检查目标方言、整数范围、边界/表示、初始化、所有权/清理、类型/宏与目标验证；Base 的行数、参数、status/TRY、类型拼写等只在与活树契约兼容时作为 house style。 |
-| Embedded Overlay | 叠在 Base 之上的嵌入式规则；与 Base 同属 skill `write-legible-embedded-c`（HOST 调 Base，EMBEDDED 走 Hard Order）。Base 正文仍为 7etsuo 原作，置于 references/base/。 |
-| HOST Deliver gate | HOST 交付 fail-closed：必须对最终 diff 逐项应用 C Quality Floor checklist 与 Base `c-standard.md` §14，任一未过即交付不完整；不兼容的 Base 条目按真实约束记录偏差。`MODULE_TRY`/`FOO_TRY` 仅在 Base §9 的非获取 orchestrator 条件成立时使用。 |
-| Constraint Priority | 规则冲突时的优先级：用户意图/活树/目标方言/测试/API、ABI、wire 与硬件契约/上下文/安全、时延、体积 ≥ C Quality Floor + Embedded Overlay ≥ Base legibility preferences。 |
-| Execution Context | 代码运行的调度环境，跨 Linux / RT-Thread / Zephyr 统一抽象。取值：ISR、Deferred、Thread、Init。决定可睡性、锁/同步原语、能否阻塞。 |
-| ISR | 硬中断或必须极短、通常不可睡眠的中断上下文（含需同等约束的上半部）。 |
-| Deferred | 从中断延后的处理：tasklet、workqueue、softirq 下半、RTOS 延后任务等。 |
-| Thread | 可调度线程上下文：用户线程、内核线程、RTOS 任务等（可否睡眠/加锁依具体平台与锁类型）。 |
-| Init | 启动、模块初始化、BSP 上电/枚举序列等非热路径编排上下文。 |
-| Path Class | 对本段代码施加哪套机读/legibility 规则。取值：ORCH、HOT、BOUND、DRIVER。 |
-| ORCH | 编排档：先过 C Quality Floor，再在兼容处应用 Base orchestrator/leaf/adapter、status 与 §14。用于 init、状态机主流程、可调度业务逻辑。 |
-| HOT | 热路径档：读取顺序固定为 C Quality Floor → HOT Rules → 触发的平台/并发引用；禁止仅为行数强拆，每个调用按时延、栈与上下文证明合理。 |
-| BOUND | 边界档：先过 C Quality Floor，再用薄 adapter 对接冻结的 Vendor/SDK/内核公共 API；Base adapter 风格仅在兼容处补充。 |
-| DRIVER | 驱动树档：先过 C Quality Floor，再按宿主树和平台规则实现；Base Standard 只作补充。 |
-| HOT Rules (H1–H6) | HOT 门禁：H1 关 Base 15/40；H2/H6 与 Classification 的 Path Class/CTX/HOT call notes **字段绑定（缺则失败）**；H3–H5 各一行决策，细节指向树与 concurrency ban list，不重讲驱动写法。 |
-| Overlay Doc Layers | L0 = 分支/Hard Order/交付门禁 + H1–H6 字段耦合 + PC 禁区（**gate，非驱动教程**）；L1 = 平台**特有**所有权与验证（指针到树/并发/HOT，不重讲通用 ISR/锁课）。**Linux L1 仍可更深**；Zephyr/RT-Thread 更薄。L2 不进 skill。 |
-| Classification record | 交付/审查时的唯一分类产物，模板在 `references/classify-repo.md`。必填 Branch、Active Git Root、Repo Kind、Platform、Path Class、CTX、Governing rules；HOT 时 **HOT call notes 必填**（`none` 或 `call → reason`），非 HOT **省略该字段**（禁止 `n/a` 填充）。仅覆盖**本次编辑**的 entry/hunk；按 Path×CTX 合并，禁止为未改 helper 滥增 region。Path/CTX 不同须多 region；缺 record 或字段 ⇒ fail-closed。 |
-| Prior-contamination ban list | `concurrency-memory.md` 中 PC1–PC8 可勾选禁止项（自造 portable sync/reactor、`volatile` 当同步、ISR 堆分配/睡眠、无树依据的零调用教条、绕过 MMIO accessor、仅凭 common practice 选型等）；未全部通过则并发门禁失败。 |
-| Super SDK Repo | 顶层大 git 仓库：产品/SDK 主体。工作树内可**嵌套**其它 git 仓库（子模块或嵌套 clone）。 |
-| Nested Kernel/BSP Repo | 位于 Super SDK 工作树某路径下的嵌套 git 仓（如 Linux/BSP 路径）：内核、驱动、中断、线程、板级与硬件紧耦合代码。 |
-| Repo Kind | 推断第一刀：当前文件落在**哪一个 Active Git Root**——在 Super SDK 根下且不在嵌套内核仓内 → SDK 姿态；在 Nested Kernel/BSP 根内 → 内核/BSP 姿态。 |
-| Active Git Root | 当前文件所属的最近 git 根。默认 Path Class 与 L1 平台附录都相对该根选择，禁止用 Super SDK 根对嵌套内核树一刀切。为 Repo Kind 的**主信号**。 |
-| Keyword Heuristic | 路径/树内关键词的**辅信号**（如 `linux`、`zephyr`、`rt-thread`、`drivers/`、`Kconfig`、`bsp`）。用于：印证 Active Git Root、在嵌套 `.git` 异常时提示、选择 L1 平台附录。**不得单独压过**明确的 Active Git Root；主辅冲突时以 Git Root 为准，或向用户确认。 |
-| Skill Package | 团队用 **一个目录** `write-legible-embedded-c/` 进 git 与分发；内含 SKILL.md 与 references/base/（vendored write-legible-c）。无需再包一层 bundle。 |
-| Attribution | 在 Bundle 的 README 中声明使用了 write-legible-c、来源仓库/作者、许可证与未修改/修改范围，以尊重原作者知识产权；不将 Base 宣称为自研正文。 |
-| Hard Order | Agent 固定工作流：① Active Git Root + Keyword Heuristic → ② Repo Kind / Path Class / CTX 与局部树约束 → ③ 加载 Bundle 内 Base + Overlay L0 → ④ 按 Linux/Zephyr/RT-Thread 或实际 BSP 加载 L1/平台规则并确认构建、接口、并发与 MMIO 边界 → ⑤ 改代码 → ⑥ checklist（HOT 则含 H1–H6）。 |
+| 入口 / Hard Order / Deliver | [`SKILL.md`](../../skills/engineering/write-legible-embedded-c/SKILL.md) |
+| Base Standard（vendored write-legible-c） | [`references/base/`](../../skills/engineering/write-legible-embedded-c/references/base/) |
+| C Quality Floor | [`references/c-quality.md`](../../skills/engineering/write-legible-embedded-c/references/c-quality.md) |
+| Active Git Root / Repo Kind / 默认 Path·CTX / Classification record | [`references/classify-repo.md`](../../skills/engineering/write-legible-embedded-c/references/classify-repo.md) |
+| Path Class / Execution Context（含义） | [`references/path-class.md`](../../skills/engineering/write-legible-embedded-c/references/path-class.md) |
+| HOT Rules (H1–H6) | [`references/hot-rules.md`](../../skills/engineering/write-legible-embedded-c/references/hot-rules.md) |
+| Prior-contamination ban list (PC1–PC8) | [`references/concurrency-memory.md`](../../skills/engineering/write-legible-embedded-c/references/concurrency-memory.md) |
+| L1 平台附录 | [`references/platforms/`](../../skills/engineering/write-legible-embedded-c/references/platforms/) |
+| 打包决策 (ADR) | [`docs/adr/0001-base-plus-embedded-overlay-bundle.md`](../adr/0001-base-plus-embedded-overlay-bundle.md) |
+| 归属 / 安装说明 | skill 内 `README.md`、`NOTICE` |
+
+## 速查（无规则）
+
+| 记号 | 一句话 |
+|---|---|
+| HOST / EMBEDDED | Step 0 二选一分支 |
+| ORCH / HOT / BOUND / DRIVER | Path Class 四档 |
+| ISR / Deferred / Thread / Init | Execution Context |
+| Super SDK / Nested Kernel/BSP | Repo Kind |
+| Constraint priority | 活树与契约 ≥ Quality floor + overlay ≥ Base 审美 |

@@ -1,5 +1,8 @@
 # Path Class and Execution Context
 
+Definitions only. **Defaults**, **Classification record**, and multi-region
+rules live in [classify-repo.md](classify-repo.md).
+
 ## Execution Context
 
 Where the code runs (cross OS):
@@ -22,23 +25,7 @@ Which legibility regime applies:
 | **BOUND** | Quality floor first; then a thin adapter over the frozen foreign API (Vendor, SDK export, kernel uAPI). Base adapter style applies only where compatible. |
 | **DRIVER** | Quality floor first; then host-tree style and selected platform rules. Base only supplements Linux, Zephyr, RT-Thread, or BSP conventions. |
 
-## Default matrix
+## Source comments
 
-| Repo Kind | Typical region | Default Path | Default CTX |
-|-----------|----------------|--------------|-------------|
-| Nested Kernel/BSP | IRQ handler | HOT | ISR |
-| Nested Kernel/BSP | probe/init | ORCH or DRIVER | Init |
-| Nested Kernel/BSP | normal driver ops | DRIVER | Thread |
-| Super SDK | middleware, API, samples | ORCH | Thread / Init |
-| Super SDK | glue calling kernel/BSP headers | BOUND | Thread |
-| Super SDK | must not contain kernel-private includes | — | fix structure |
-
-## Classification record
-
-Record **Path Class** and **CTX** in [classify-repo.md](classify-repo.md) —
-the only required artifact for “classification recorded.” EMBEDDED: multi-region
-(minimal: edited Path×CTX only), HOT `HOT call notes` required / non-HOT omit,
-fail-closed per SKILL.md Deliver.
-
-Source comments only when context is not evident from entry/locking/API; host
-style (no invented `/* PATH: HOT */` unless the tree already uses that).
+Comment only when context is not evident from entry/locking/API; host style
+(no invented `/* PATH: HOT */` unless the tree already uses that).

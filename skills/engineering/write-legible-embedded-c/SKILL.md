@@ -1,12 +1,11 @@
 ---
 name: write-legible-embedded-c
 description: >
-  Legible, context-correct C writing and review. Use for host userspace C or
-  embedded, Linux-kernel, Zephyr, RT-Thread, BSP, and bare-metal C, especially
-  drivers, ISR/deferred paths, shared state, MMIO/DMA, board bring-up, and
-  platform boundaries.
+  HOST or EMBEDDED C — write or review host userspace C, or
+  Linux/Zephyr/RT-Thread/BSP/bare-metal C (drivers, ISR/deferred, MMIO/DMA,
+  shared state, board bring-up, platform boundaries).
 metadata:
-  short-description: "Legible, context-correct host and embedded C"
+  short-description: "HOST|EMBEDDED C write and review"
 ---
 
 # Write Legible Embedded C
@@ -86,12 +85,12 @@ known, and governing local rules/build files. Root beats keywords.
 
 ### 2. Assign Path Class and CTX
 
-Follow [path-class.md](references/path-class.md).
+Meanings: [path-class.md](references/path-class.md). Defaults and Classification
+record: [classify-repo.md](references/classify-repo.md).
 
 **Done when:** each region has Path Class ∈ {ORCH, HOT, BOUND, DRIVER} and
-CTX ∈ {ISR, Deferred, Thread, Init, N/A}. Defaults: Nested Kernel/BSP → DRIVER
-(ISR/fast → HOT); Super SDK → ORCH. Mixed Path/CTX ⇒ **multiple** Classification
-blocks (see Deliver).
+CTX ∈ {ISR, Deferred, Thread, Init, N/A}. Mixed Path/CTX ⇒ **multiple**
+Classification blocks (see Deliver).
 
 ### 3. Load rules
 

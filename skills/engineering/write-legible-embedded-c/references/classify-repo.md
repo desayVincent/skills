@@ -1,5 +1,9 @@
 # Classify repo (Active Git Root + keywords)
 
+**Single home** for Repo Kind defaults, Path Class/CTX default matrix, and the
+Classification record. Path Class and CTX **meanings**: [path-class.md](path-class.md).
+EMBEDDED Deliver (SKILL.md), Step 5, and H2/H6 point here for the record.
+
 ## Primary: Active Git Root
 
 For each file path:
@@ -13,12 +17,21 @@ For each file path:
 | **Nested Kernel/BSP** | Active Git Root is a nested repo under a larger Super SDK tree, **or** the root itself is a kernel/BSP tree (Linux, Zephyr, RT-Thread, dedicated BSP). |
 | **Super SDK** | Active Git Root is the product/SDK top repo, and the file is **not** inside another nested kernel/BSP git root. |
 
-Defaults:
-
-- Nested Kernel/BSP → prefer **DRIVER**; interrupt/fast path → **HOT**.
-- Super SDK → prefer **ORCH**; calls into kernel/BSP ABI → **BOUND**.
-
 Never apply Super SDK defaults to files whose Active Git Root is the nested kernel.
+
+## Default Path Class and CTX
+
+| Repo Kind | Typical region | Default Path | Default CTX |
+|-----------|----------------|--------------|-------------|
+| Nested Kernel/BSP | IRQ handler / fast path | HOT | ISR |
+| Nested Kernel/BSP | probe/init | ORCH or DRIVER | Init |
+| Nested Kernel/BSP | normal driver ops | DRIVER | Thread |
+| Super SDK | middleware, API, samples | ORCH | Thread / Init |
+| Super SDK | glue calling kernel/BSP ABI | BOUND | Thread |
+| Super SDK | kernel-private includes in SDK tree | — | fix structure |
+
+Kind-level shortcuts when the region is unclear: Nested Kernel/BSP → **DRIVER**
+(interrupt/fast → **HOT**); Super SDK → **ORCH** (kernel/BSP ABI call → **BOUND**).
 
 ## Secondary: Keyword Heuristic
 
@@ -40,22 +53,19 @@ Rules:
 
 ## Classification record (template)
 
-**Single home** for delivery/review classification. EMBEDDED Deliver (SKILL.md),
-Step 5, H2/H6, and [path-class.md](path-class.md) all point here.
-
 ### Region scope (minimal, fail bloat)
 
-- Emit blocks only for **regions you edit** (entry points / callbacks / coherent
-  hunks in the diff). Do **not** invent a block for an unchanged tree helper
-  you only *call* (e.g. existing drop stats, logging, shared library).
-- **One block per distinct (Path Class × CTX)** among those edited regions —
-  not one block per function when several share the same class and context.
+- Emit blocks only for **regions you edit or review** (entry points / callbacks /
+  coherent hunks in the diff). Do **not** invent a block for an unchanged tree
+  helper you only *call* (e.g. existing drop stats, logging, shared library).
+- **One block per distinct (Path Class × CTX)** among those regions — not one
+  block per function when several share the same class and context.
 - Prefer the **smallest** set that still separates mixed Path/CTX (e.g. IRQ +
   Deferred + Thread → typically **3** blocks, not 5+).
 
 **Multi-region gate:** mixed Path Class or CTX under one blanket class **fails**.
-**Anti-bloat:** extra blocks that do not correspond to edited code, or duplicate
-the same Path×CTX without a distinct entry path, are **noise** (trim them).
+**Anti-bloat:** extra blocks that do not correspond to edited/reviewed code, or
+duplicate the same Path×CTX without a distinct entry path, are **noise** (trim them).
 
 ### HOT call notes field
 
@@ -77,5 +87,6 @@ Keyword notes: <optional>
 HOT call notes: <only if Path Class = HOT: none | call → reason lines>
 ```
 
-**Done when:** required fields filled for each **edited** region; HOT blocks
-have valid `HOT call notes`; non-HOT blocks omit that field; no bloat regions.
+**Done when:** required fields filled for each **edited or reviewed** region;
+HOT blocks have valid `HOT call notes`; non-HOT blocks omit that field; no
+bloat regions.

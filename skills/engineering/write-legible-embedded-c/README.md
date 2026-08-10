@@ -2,9 +2,8 @@
 
 Single skill for **host userspace C** and **embedded/kernel/BSP C** (Linux, Zephyr, RT-Thread).
 
-**Correctness before shape; classify before styling.** The model-invoked
-description covers both host and embedded branches without project-specific
-trigger vocabulary.
+**Correctness before shape; classify before styling.** Model-invoked description
+front-loads **HOST|EMBEDDED** write/review triggers (no project-specific jargon).
 
 | Branch | Behavior |
 |--------|----------|
