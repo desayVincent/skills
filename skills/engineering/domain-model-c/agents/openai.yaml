@@ -1,0 +1,3 @@
+interface:
+  display_name: "Domain Model (C/C++)"
+  short_description: "Ubiquitous language for C/C++ SDK projects"

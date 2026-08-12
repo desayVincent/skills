@@ -1,0 +1,19 @@
+Third-Party Notice
+==================
+
+improve-architecture-c is derived from:
+
+  Skill name (upstream): improve-codebase-architecture
+  Author: Matt Pocock
+  Project: https://github.com/mattpocock/skills
+  License: MIT (see LICENSE in this directory)
+  Upstream version pin (when copied): v1.2.2 / commit 8b36d4fb2635b3c21998dcd8144439c9e5ba7302
+
+Renamed to avoid collision with the upstream skill name. Process shape
+(scope → explore → HTML report → grill → optional domain capture) follows
+upstream. Explore friction list, dependency tags, diagram examples, inline
+vocabulary, and C/C++ / SDK focus are team adaptations.
+
+This skill is **self-contained**: it does not require installing sibling skills
+to run. Related team skills (deep-modules-c, domain-model-c) are optional peers
+with overlapping vocabulary, not runtime dependencies.

@@ -1,0 +1,15 @@
+Third-Party Notice
+==================
+
+domain-model-c is derived from:
+
+  Skill name (upstream): domain-modeling
+  Author: Matt Pocock
+  Project: https://github.com/mattpocock/skills
+  License: MIT (see LICENSE in this directory)
+  Upstream version pin (when copied): v1.2.2 / commit 8b36d4fb2635b3c21998dcd8144439c9e5ba7302
+
+Renamed to avoid collision with the upstream skill name. Process (glossary in
+CONTEXT.md, sparse ADRs, challenge terms against code) follows upstream.
+Term examples, multi-context layouts, and C/C++ / SDK language guidance are
+team adaptations.
