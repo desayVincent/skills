@@ -103,7 +103,8 @@ reverse · surprising without context · real trade-off.
 
 ### 2. Explore
 
-Walk the scope. Apply the deletion test. Tag dependency category. Use the lens:
+Walk the scope (read real files). Prefer organic friction over filling a form.
+Apply the deletion test. Tag dependency category. Use the lens as a search aid:
 
 | Signal | Look for |
 |--------|----------|
@@ -119,7 +120,26 @@ Walk the scope. Apply the deletion test. Tag dependency category. Use the lens:
 | Duplicated lifecycle | Same protocol state machine in multiple shallow modules |
 | C++ ABI leak | Exceptions/RTTI/layout across a stable shared edge without ADR |
 
-**Strength badges**
+#### Minimal anchor (only anti-hallucination rule)
+
+Trust exploration + human grill (Matt-style). Do **not** build audit theatre.
+Each candidate needs only:
+
+1. **Paths that exist** — list real repo-relative files you opened; inventing
+   modules or paths is forbidden.
+2. **One reconcilable observation** — one sentence of what is *in those files*
+   (e.g. “`session.h` exports full `struct Session`”). A reader who opens the
+   paths must be able to confirm or reject it in about two minutes.
+3. Optional: `path:line` or a 2–8 line excerpt when it shortens verification.
+   Not required for every card.
+
+Deliberately **not** required: dual-evidence Strong gates, command-output
+dumps, cold-path commit thresholds, local analysis scripts, or a long checkbox
+ceremony.
+
+Prefer **at most ~5** candidates. Drop weak ones rather than padding.
+
+**Evidence badges** (report: 强证据 / 值得分析 / 证据不足)
 
 | Badge | Use when |
 |-------|----------|
@@ -127,9 +147,10 @@ Walk the scope. Apply the deletion test. Tag dependency category. Use the lens:
 | **Worth exploring** | Real friction; payoff or scope still uncertain |
 | **Speculative** | Thin evidence, cold code, or would reopen a firm ADR |
 
-**Done when:** each candidate has files, one-sentence problem, deletion-test
-result, category, and badge. ADR conflicts marked only when reopening is justified.
-
+**Done when:** each candidate has existing paths, one reconcilable observation,
+one-sentence problem, deletion-test stance, category, and badge. ADR conflicts
+marked only when reopening is justified. No candidate without the minimal
+anchor.
 ### 3. HTML report — then stop
 
 Write: `$TMPDIR`|/tmp|`%TEMP%` → `architecture-review-c-<timestamp>.html`
@@ -153,8 +174,8 @@ or:
 Report path: <absolute-path>
 ```
 
-**Done when:** HTML is readable, path reported, re-invoke line given, turn stops
-without grilling.
+**Done when:** HTML is readable; every card still satisfies the minimal anchor;
+report path and re-invoke line given; turn stops without grilling.
 
 ### 4. Grill the pick (inline — no extra skill)
 
