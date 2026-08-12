@@ -31,7 +31,7 @@ Each skill is a directory with at least `SKILL.md`. Optional: `references/`, `ag
 | [write-legible-embedded-c](./skills/engineering/write-legible-embedded-c/) | `/write-legible-embedded-c` | Legible C for host **and** embedded (Linux / Zephyr / RT-Thread, BSP, ISR). Vendors Base [write-legible-c](https://github.com/7etsuo/write-legible-c) (MIT) under `references/base/`. |
 | [deep-modules-c](./skills/engineering/deep-modules-c/) | `/deep-modules-c` | Deep-module vocabulary for C/C++ / SDK (module, interface, depth, seam, ops). Derived from Matt’s `codebase-design` (MIT); renamed to avoid collision. |
 | [domain-model-c](./skills/engineering/domain-model-c/) | `/domain-model-c` | Ubiquitous language + `CONTEXT.md` / ADRs for C/C++ SDK (session, stream, message, error semantics). Derived from Matt’s `domain-modeling` (MIT). |
-| [improve-architecture-c](./skills/engineering/improve-architecture-c/) | `/improve-architecture-c` | Scan C/C++ trees for deepening opportunities → HTML report → inline grill. **Self-contained** (no sibling skill required). Derived from Matt’s `improve-codebase-architecture` (MIT). |
+| [improve-architecture-c](./skills/engineering/improve-architecture-c/) | `/improve-architecture-c` | Scan C/C++ trees for deepening opportunities → controlled-Chinese HTML report → inline grill. **Self-contained** (no sibling skill required). Derived from Matt’s `improve-codebase-architecture` (MIT). |
 
 **Suggested flow (optional composition):** `domain-model-c` → `deep-modules-c` → `improve-architecture-c` → `write-legible-embedded-c`. Each skill runs alone if only one is installed. Line-level over-engineering on diffs: upstream **`ponytail-review`** (not vendored here).
 

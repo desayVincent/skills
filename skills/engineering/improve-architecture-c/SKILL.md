@@ -1,8 +1,9 @@
 ---
 name: improve-architecture-c
 description: >
-  Scan C/C++ or SDK trees for deepening opportunities; HTML report; then grill
-  the chosen candidate. Re-invoke with grill <candidate> after the report pause.
+  Scan C/C++ or SDK trees for deepening opportunities; generate a controlled-
+  Chinese HTML report; then grill the chosen candidate. Re-invoke with grill
+  <candidate> after the report pause.
 disable-model-invocation: true
 metadata:
   short-description: "Deepen C/C++ architecture (HTML report)"
@@ -133,8 +134,9 @@ result, category, and badge. ADR conflicts marked only when reopening is justifi
 
 Write: `$TMPDIR`|/tmp|`%TEMP%` → `architecture-review-c-<timestamp>.html`
 
-Scaffold/safety: [HTML-REPORT.md](HTML-REPORT.md). Use vocabulary above + any
-CONTEXT product names.
+Read and apply [HTML-REPORT.md](HTML-REPORT.md). Its Chinese terminology and
+copy rules are mandatory for all visible report text. Keep code identifiers,
+paths, symbols, commands, category keys, and product terms unchanged.
 
 Report **absolute path**. Open (`xdg-open`/`open`/`start`) is best-effort.
 No full interface designs yet.
