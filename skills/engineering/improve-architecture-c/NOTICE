@@ -17,3 +17,10 @@ vocabulary, and C/C++ / SDK focus are team adaptations.
 This skill is **self-contained**: it does not require installing sibling skills
 to run. Related team skills (deep-modules-c, domain-model-c) are optional peers
 with overlapping vocabulary, not runtime dependencies.
+
+Selected guidance additionally reviewed at upstream commit
+3cca18b368ae95cdbdebbff572ccafa662551015: caller-composition friction
+(improve-codebase-architecture/SKILL.md), internal test seams
+(codebase-design/DEEPENING.md), and caller examples for alternative designs
+(codebase-design/DESIGN-IT-TWICE.md), under skills/engineering/.
+These are selective C/C++ adaptations, not a full upstream replacement.

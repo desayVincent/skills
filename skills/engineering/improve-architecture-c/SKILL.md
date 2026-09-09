@@ -44,7 +44,8 @@ On **Full run**: steps 1→3 only; stop after step 3 (see re-invoke line).
 
 ## Vocabulary (architecture analysis)
 
-Keep product names from `CONTEXT.md` / headers. Use these terms for structure:
+Keep product names from `CONTEXT.md` / headers. The terms below guide analysis;
+write report text using the concrete Chinese descriptions in `HTML-REPORT.md`.
 
 | Term | Meaning |
 |------|---------|
@@ -104,7 +105,12 @@ reverse · surprising without context · real trade-off.
 ### 2. Explore
 
 Walk the scope (read real files). Prefer organic friction over filling a form.
-Apply the deletion test. Tag dependency category. Use the lens as a search aid:
+Apply the deletion test. Tag dependency category. For a suspected problem, trace
+the relevant caller, implementation, and any callback or cleanup path. Check
+whether their combination scatters ordering, error handling, or resource release
+across callers; isolated function tests alone do not establish this. Inspect only
+mechanisms present in the scoped code, not a mandatory lock/thread/HAL checklist.
+Use the lens as a search aid:
 
 | Signal | Look for |
 |--------|----------|
@@ -188,13 +194,16 @@ Walk:
 1. Fixed constraints (ABI, realtime, memory, threads)?
 2. Dependency category + known boundary for any seam?
 3. Deepened module’s public interface facts (not full headers yet)?
-4. What stays behind the seam; which adapters exist or will exist?
-5. Which tests survive (contract vs white-box)?
+4. What stays internal; which adapters exist or are justified? Keep test-only
+   replacement points private unless real callers need them in the public SDK.
+5. Which observable behaviors do existing tests protect? Keep that coverage;
+   remove redundant internal tests only after replacement coverage is verified.
 6. What belongs in CONTEXT or an ADR under the write gate?
 
-Optional: if the user wants more design options, sketch 3 different interfaces
-in this session (min surface / max extension / common-caller) without another
-skill.
+Optional: if the user wants alternatives, compare 2–3 materially different
+interfaces within the confirmed constraints. For each, show a short C/C++ caller
+example, what callers must know, what the module handles internally, and the
+trade-off. Recommend one; do not invent extension needs to fill the comparison.
 
 Under the write gate: new/sharpened terms → CONTEXT (or proposal); load-bearing
 rejection that would reappear in a future scan → offer ADR.
