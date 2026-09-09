@@ -1,0 +1,14 @@
+Third-Party Notice
+==================
+
+Personal adaptation: spawn
+Upstream: https://github.com/obra/superpowers
+Upstream skill: skills/dispatching-parallel-agents/SKILL.md
+Revision: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+Author: Jesse Vincent
+License: MIT (see LICENSE in this directory)
+Source: https://github.com/obra/superpowers/blob/b36e0829c6d0140e93cfef2ca599b1b07d4a7797/skills/dispatching-parallel-agents/SKILL.md
+
+基于原有个人 spawn 改写，移除固定厂商、模型与工具 API；吸收上游任务独立性、共享资源与集成复核方法。
+
+本目录保留来源与许可证，不声明上游文字为本仓原创。

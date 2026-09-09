@@ -1,0 +1,14 @@
+Third-Party Notice
+==================
+
+Personal adaptation: receiving-code-review
+Upstream: https://github.com/obra/superpowers
+Upstream skill: skills/receiving-code-review/SKILL.md
+Revision: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+Author: Jesse Vincent
+License: MIT (see LICENSE in this directory)
+Source: https://github.com/obra/superpowers/blob/b36e0829c6d0140e93cfef2ca599b1b07d4a7797/skills/receiving-code-review/SKILL.md
+
+精简为独立中文流程；明确审阅与修复授权；允许继续处理明确且独立的意见，不因单项存疑暂停全部工作。
+
+本目录保留来源与许可证，不声明上游文字为本仓原创。

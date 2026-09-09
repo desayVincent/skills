@@ -1,0 +1,14 @@
+Third-Party Notice
+==================
+
+Personal adaptation: systematic-debugging
+Upstream: https://github.com/obra/superpowers
+Upstream skill: skills/systematic-debugging/SKILL.md
+Revision: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+Author: Jesse Vincent
+License: MIT (see LICENSE in this directory)
+Source: https://github.com/obra/superpowers/blob/b36e0829c6d0140e93cfef2ca599b1b07d4a7797/skills/systematic-debugging/SKILL.md
+
+精简为独立中文流程；补充嵌入式观测、复现限制和环境证据；取消固定失败次数对应架构错误的断言，以及对整套 Superpowers 的强制依赖。
+
+本目录保留来源与许可证，不声明上游文字为本仓原创。
