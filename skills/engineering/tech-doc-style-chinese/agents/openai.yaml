@@ -1,0 +1,4 @@
+interface:
+  display_name: "Chinese Technical Writing"
+  short_description: "Write and revise clear, evidence-backed Chinese technical documents"
+  default_prompt: "Use $tech-doc-style-chinese. Follow the requested writing, rewriting, proofreading, or read-only review scope; preserve technical facts and machine-readable content."

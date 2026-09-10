@@ -15,6 +15,7 @@ skills/                              ← this repository root
 │   │   ├── improve-architecture-c/  ← Matt-derived, C/C++ architecture scan
 │   │   ├── spawn/                   ← portable task delegation
 │   │   ├── systematic-debugging/    ← evidence-first debugging
+│   │   ├── tech-doc-style-chinese/  ← Chinese technical writing
 │   │   └── receiving-code-review/   ← verify and address review feedback
 │   ├── productivity/                ← (future) grill, docs helpers, …
 │   └── in-progress/                 ← (future) not ready to share
@@ -38,6 +39,7 @@ Each skill is a directory with at least `SKILL.md`. Optional: `references/`, `ag
 | [spawn](./skills/engineering/spawn/) | `/spawn` | 按任务独立性、共享资源和验证条件分工；模型与角色由宿主或项目决定。 |
 | [systematic-debugging](./skills/engineering/systematic-debugging/) | `/systematic-debugging` | 先取证、验证根因，再修复；支持嵌入式和无法立即复现的环境。 |
 | [receiving-code-review](./skills/engineering/receiving-code-review/) | `/receiving-code-review` | 核实已有审查意见，在授权范围内处理；存疑项不阻塞独立修改。 |
+| [tech-doc-style-chinese](./skills/engineering/tech-doc-style-chinese/) | `/tech-doc-style-chinese` | 中文技术写作、旧文更新与表达整理；保留技术事实，按需加载写作方法及模式检查。 |
 
 **Suggested flow (optional composition):** `domain-model-c` → `deep-modules-c` → `improve-architecture-c` → `write-legible-embedded-c`. Each skill runs alone if only one is installed. Line-level over-engineering on diffs: upstream **`ponytail-review`** (not vendored here).
 
@@ -76,7 +78,7 @@ Reload Grok / new session after install.
 ```bash
 personal_skills_root="$(git rev-parse --show-toplevel)/skills/engineering"
 mkdir -p "$HOME/.agents/skills"
-for name in spawn systematic-debugging receiving-code-review; do
+for name in spawn systematic-debugging receiving-code-review tech-doc-style-chinese; do
   dst="$HOME/.agents/skills/$name"
   if [ -e "$dst" ] || [ -L "$dst" ]; then
     printf '跳过已有入口，请检查目标：%s\n' "$dst"
@@ -86,9 +88,11 @@ for name in spawn systematic-debugging receiving-code-review; do
 done
 ```
 
+各 Agent 的专属技能目录可链接到 `~/.agents/skills/<name>`，共用同一份仓库文件。
+
 已有同名入口时先检查目标，不覆盖目录或复制出第二份。移走宿主专属技能目录中的旧副本，避免重复发现；个人仓库是维护来源。宿主不支持该目录时，使用其技能路径配置指向本仓。按需重启宿主以刷新列表。
 
-这三个技能均可独立使用，不串联完整 Superpowers 流程。与 `diagnosing-bugs` 等已有调试技能重叠时，由用户或项目选择入口，不叠加两套强制流程。模型选择、硬件访问和外部操作权限继续由宿主及项目规则决定。
+这些技能均可独立使用，不串联完整 Superpowers 流程。与 `diagnosing-bugs` 等已有调试技能重叠时，由用户或项目选择入口，不叠加两套强制流程。模型选择、硬件访问和外部操作权限继续由宿主及项目规则决定。
 
 If you use [skills.sh](https://skills.sh) style tooling later, point it at this GitHub repo the same way you would `mattpocock/skills`.
 

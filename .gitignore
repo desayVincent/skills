@@ -7,3 +7,7 @@ node_modules/
 # skill-creator eval workspaces
 *-workspace/
 .factory/
+
+# Python skill validation caches
+__pycache__/
+*.pyc
