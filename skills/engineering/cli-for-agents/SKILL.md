@@ -4,10 +4,10 @@ description: >
   CLI：设计、改动或审计 Agent 可驱动的命令行。
   用于新 CLI、给现有 CLI 做加法、按源码打 agent-readiness 分；
   也用于把编译、打包、刷机、测试等可重复操作做成 CLI 而不是 skill。
-license: MIT
+license: SEE NOTICE
 metadata:
-  version: "1.3.0"
-  sources: clig.dev, pnocera/agent-cli-design, jpoehnelt/skills/agent-dx-cli-scale
+  version: "1.4.0"
+  sources: clig.dev, pnocera/agent-cli-design
   offline: self-contained
 ---
 
@@ -31,7 +31,7 @@ Done when the deliverable is named: new CLI, additive change to a named binary, 
 |---|---|---|---|
 | 1 | Human and TTY surface | [vendor/clig/cli-guidelines.md](vendor/clig/cli-guidelines.md) | [references/human-cli.md](references/human-cli.md) |
 | 2 | Agent help-as-API, audit, probe | [vendor/agent-cli-design/agent-cli-design.md](vendor/agent-cli-design/agent-cli-design.md) | [references/agent-cli.md](references/agent-cli.md) |
-| 3 | Score 0–21 | [vendor/agent-dx-cli-scale/agent-dx-cli-scale.md](vendor/agent-dx-cli-scale/agent-dx-cli-scale.md) | [references/scorecard.md](references/scorecard.md) |
+| 3 | Score 0–21 | — | [references/scorecard.md](references/scorecard.md) |
 | — | Parser and runtime (shell, Python, …) | — | [references/runtimes.md](references/runtimes.md) |
 
 Provenance: [NOTICE](NOTICE) and [vendor/NOTICE.md](vendor/NOTICE.md). Inventory: [references/sources.md](references/sources.md).
@@ -46,7 +46,7 @@ Do not read every reference. Identify the mode, then follow only that path.
 |---|---|---|
 | **A. Design** | creating a CLI or a new command group | this file → `runtimes.md` → `human-cli.md` → `vendor/agent-cli-design/agent-cli-design.md` (Mode A) |
 | **B. Change** | modifying an existing CLI | this file → inventory (include runtime) → vendor Mode B |
-| **C. Audit / Score** | reviewing agent-readiness | `vendor/agent-dx-cli-scale/agent-dx-cli-scale.md` then vendor Mode C and `vendor/agent-cli-design/references/probe.sh` when a binary exists |
+| **C. Audit / Score** | reviewing agent-readiness | this file (trust gate) → `scorecard.md` → vendor Mode C; `probe.sh` only for a trusted binary or inside a sandbox |
 
 Completion criterion for this step: one mode named, and the files for that mode opened.
 
@@ -92,11 +92,18 @@ Done when the inventory lists every command touched and every skipped breaking f
 ## Mode C — Audit / Score
 
 1. Enumerate the surface from source registration.
-2. Score the seven axes from `vendor/agent-dx-cli-scale/agent-dx-cli-scale.md` (index: `references/scorecard.md`). Cite evidence per axis — a command, a flag, or an observed failure. Do not award a 2 or 3 without a named command.
-3. Separately list Tier-1 invariant failures from `vendor/agent-cli-design/agent-cli-design.md`. If the subject is an executable on PATH, run `vendor/agent-cli-design/references/probe.sh` rather than improvising help probes. Use `vendor/agent-cli-design/references/audit-checklist.md` as the audit form.
-4. End with total (0–21), rating, the cheapest additive fixes that raise the score, and any multi-surface notes (MCP, headless auth) as unscored extras.
+2. Classify the binary before any probe:
+   - **Trusted** — first-party, in-tree, or the user named it as a binary they own.
+   - **Untrusted** — downloaded, unknown origin, or not confirmed by the user.
+3. Score the seven axes from [references/scorecard.md](references/scorecard.md). Cite evidence per axis — a command, a flag, or an observed failure. Do not award a 2 or 3 without a named command.
+4. Separately list Tier-1 invariant failures from `vendor/agent-cli-design/agent-cli-design.md`. Use `vendor/agent-cli-design/references/audit-checklist.md` as the audit form. Do not improvise help probes.
+   - **Trusted** executable: run `vendor/agent-cli-design/references/probe.sh`.
+   - **Untrusted**: do not run `probe.sh` in the current user environment. Re-run only inside a disposable sandbox with no network and no write access to the caller's files. If that sandbox is unavailable, score from source registration and already-captured help text, and record `probe skipped: untrusted binary`.
+5. End with total (0–21), rating, the cheapest additive fixes that raise the score, and any multi-surface notes (MCP, headless auth) as unscored extras.
 
-Done when every axis has a score, evidence, and a next fix or an explicit “already maxed”.
+Done when every axis has a score, evidence, and a next fix or an explicit “already maxed”. If the probe was skipped, the report says so.
+
+`probe-tests.sh` is a harness self-check. It is not a skill release gate.
 
 ## Output the agent produces
 

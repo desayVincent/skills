@@ -1,8 +1,9 @@
-# Agent DX CLI Scale — index
+# Agent DX scorecard
 
-Full text (offline): [vendor/agent-dx-cli-scale/agent-dx-cli-scale.md](../vendor/agent-dx-cli-scale/agent-dx-cli-scale.md)
-
-When scoring, use the vendor skill. This file is a compact copy of the same seven axes.
+This file is the scoring form for Mode C. It is this skill's own operational
+checklist, inspired by Justin Poehnelt's article
+"You Need to Rewrite Your CLI for AI Agents". It is not a redistribution of
+`jpoehnelt/skills/agent-dx-cli-scale`.
 
 Score each axis 0–3. Sum is 0–21. A score of 2 or 3 requires a named command or flag as evidence.
 

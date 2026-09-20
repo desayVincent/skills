@@ -41,7 +41,7 @@ Each skill is a directory with at least `SKILL.md`. Optional: `references/`, `ag
 | [systematic-debugging](./skills/engineering/systematic-debugging/) | `/systematic-debugging` | 先取证、验证根因，再修复；支持嵌入式和无法立即复现的环境。 |
 | [receiving-code-review](./skills/engineering/receiving-code-review/) | `/receiving-code-review` | 核实已有审查意见，在授权范围内处理；存疑项不阻塞独立修改。 |
 | [tech-doc-style-chinese](./skills/engineering/tech-doc-style-chinese/) | `/tech-doc-style-chinese` | 中文技术写作、旧文更新与表达整理；保留技术事实，按需加载写作方法及模式检查。 |
-| [cli-for-agents](./skills/engineering/cli-for-agents/) | `/cli-for-agents` | 设计、改动或审计 Agent 可驱动的 CLI（Design / Change / Audit）。Vendors [clig.dev](https://clig.dev/)、[pnocera/agent-cli-design](https://github.com/pnocera/agent-cli-design)、[agent-dx-cli-scale](https://github.com/jpoehnelt/skills) under `vendor/`. |
+| [cli-for-agents](./skills/engineering/cli-for-agents/) | `/cli-for-agents` | 设计、改动或审计 Agent 可驱动的 CLI（Design / Change / Audit）。Vendors [clig.dev](https://clig.dev/) (CC BY-SA 4.0) and [pnocera/agent-cli-design](https://github.com/pnocera/agent-cli-design) (MIT) under `vendor/`. Mixed license: see that skill's `NOTICE`. |
 
 **Suggested flow (optional composition):** `domain-model-c` → `deep-modules-c` → `improve-architecture-c` → `write-legible-embedded-c`. Each skill runs alone if only one is installed. Line-level over-engineering on diffs: upstream **`ponytail-review`** (not vendored here).
 
@@ -80,7 +80,7 @@ Reload Grok / new session after install.
 ```bash
 personal_skills_root="$(git rev-parse --show-toplevel)/skills/engineering"
 mkdir -p "$HOME/.agents/skills"
-for name in spawn systematic-debugging receiving-code-review tech-doc-style-chinese; do
+for name in spawn systematic-debugging receiving-code-review tech-doc-style-chinese cli-for-agents; do
   dst="$HOME/.agents/skills/$name"
   if [ -e "$dst" ] || [ -L "$dst" ]; then
     printf '跳过已有入口，请检查目标：%s\n' "$dst"
@@ -113,7 +113,7 @@ Matt-derived skills (`deep-modules-c`, `domain-model-c`, `improve-architecture-c
 
 `systematic-debugging` and `receiving-code-review` are concise personal adaptations of `obra/superpowers`; `spawn` combines the previous personal skill with its independent-task guidance. Each folder retains the upstream MIT license and pinned provenance in `NOTICE`. These are maintained adaptations, not unmodified upstream distributions.
 
-`cli-for-agents` vendors clig.dev (CC BY-SA 4.0), `pnocera/agent-cli-design` (MIT), and `jpoehnelt/skills/agent-dx-cli-scale` under `vendor/`. Wrapper indexes are team text; see that skill's `NOTICE`.
+`cli-for-agents` is mixed-license: wrapper indexes and `references/scorecard.md` are team text; `vendor/clig/` is CC BY-SA 4.0; `vendor/agent-cli-design/` is MIT. It does not vendor `jpoehnelt/skills/agent-dx-cli-scale` (no LICENSE in that repo). See that skill's `NOTICE`.
 
 ## Design notes
 

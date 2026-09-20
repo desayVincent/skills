@@ -1,18 +1,26 @@
 Third-Party Notice
 ==================
 
-cli-for-agents is a team router and index. Full upstream texts live under
-vendor/. Wrapper files (this folder's SKILL.md and references/*.md) do not
-rebrand vendor text as original.
+This skill is mixed-license. SKILL.md frontmatter is `license: SEE NOTICE`.
 
-See vendor/NOTICE.md for licenses and git SHAs captured at copy time.
+Wrapper (this folder's SKILL.md and references/*.md)
+----------------------------------------------------
+Team router, indexes, runtime map, and scoring form. Not a rebrand of
+vendor text. Scoring in references/scorecard.md is this skill's own
+operational checklist, inspired by Justin Poehnelt's public article
+"You Need to Rewrite Your CLI for AI Agents". It is not a copy of
+jpoehnelt/skills/agent-dx-cli-scale (no LICENSE in that repo; not vendored).
 
-Packaging (overlay only; vendor wording unchanged)
---------------------------------------------------
+Vendored trees (see vendor/NOTICE.md for SHAs)
+----------------------------------------------
+  vendor/clig/                 CC BY-SA 4.0 (share-alike applies to that tree)
+  vendor/agent-cli-design/     MIT (see vendor/agent-cli-design/LICENSE.md)
+
+Packaging (overlay only; vendor wording unchanged except the pointer below)
+--------------------------------------------------------------------------
 Upstream skill entry files are stored as:
 
   vendor/agent-cli-design/agent-cli-design.md
-  vendor/agent-dx-cli-scale/agent-dx-cli-scale.md
 
 They are not named SKILL.md, so skill discovery does not register nested
 skills. Refresh copies (see references/sources.md) must keep these names.
