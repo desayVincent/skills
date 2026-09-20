@@ -1,0 +1,9 @@
+{
+  "version": "1.0.0",
+  "date": "July 2026",
+  "abstract": "Design, build, or audit a command-line tool that AI agents can drive correctly from its own help output. Covers complete inline help at every level, SEE ALSO navigation, machine-readable discovery schemas, agent-recoverable errors, safe non-interactive behavior, and a fail-closed probe harness with its own mutation-tested self-test.",
+  "references": [
+    "https://clig.dev/",
+    "https://no-color.org/"
+  ]
+}

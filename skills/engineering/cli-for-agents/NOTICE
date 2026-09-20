@@ -1,0 +1,22 @@
+Third-Party Notice
+==================
+
+cli-for-agents is a team router and index. Full upstream texts live under
+vendor/. Wrapper files (this folder's SKILL.md and references/*.md) do not
+rebrand vendor text as original.
+
+See vendor/NOTICE.md for licenses and git SHAs captured at copy time.
+
+Packaging (overlay only; vendor wording unchanged)
+--------------------------------------------------
+Upstream skill entry files are stored as:
+
+  vendor/agent-cli-design/agent-cli-design.md
+  vendor/agent-dx-cli-scale/agent-dx-cli-scale.md
+
+They are not named SKILL.md, so skill discovery does not register nested
+skills. Refresh copies (see references/sources.md) must keep these names.
+
+The only vendor wording change is the relative pointer in
+vendor/agent-cli-design/references/help-anatomy.md (`SKILL.md` →
+`agent-cli-design.md`).
