@@ -39,9 +39,12 @@ Each skill is a directory with at least `SKILL.md`. Optional: `references/`, `ag
 | [improve-architecture-c](./skills/engineering/improve-architecture-c/) | `/improve-architecture-c` | Scan C/C++ trees for deepening opportunities → controlled-Chinese HTML report → inline grill. **Self-contained** (no sibling skill required). Derived from Matt’s `improve-codebase-architecture` (MIT). |
 | [spawn](./skills/engineering/spawn/) | `/spawn` | 按任务独立性、共享资源和验证条件分工；模型与角色由宿主或项目决定。 |
 | [systematic-debugging](./skills/engineering/systematic-debugging/) | `/systematic-debugging` | 先取证、验证根因，再修复；支持嵌入式和无法立即复现的环境。 |
+| [skill-eval](./skills/engineering/skill-eval/) | `/skill-eval` | 个人按需用现有 Codex runner 评测 `acme-writing-embedded-c` 的触发与版本对照；首版仅支持这一目标 Skill。 |
 | [receiving-code-review](./skills/engineering/receiving-code-review/) | `/receiving-code-review` | 核实已有审查意见，在授权范围内处理；存疑项不阻塞独立修改。 |
 | [tech-doc-style-chinese](./skills/engineering/tech-doc-style-chinese/) | `/tech-doc-style-chinese` | 中文技术写作、旧文更新与表达整理；保留技术事实，按需加载写作方法及模式检查。 |
 | [cli-for-agents](./skills/engineering/cli-for-agents/) | `/cli-for-agents` | 设计、改动或审计 Agent 可驱动的 CLI（Design / Change / Audit）。Vendors [clig.dev](https://clig.dev/) (CC BY-SA 4.0) and [pnocera/agent-cli-design](https://github.com/pnocera/agent-cli-design) (MIT) under `vendor/`. Mixed license: see that skill's `NOTICE`. |
+
+`skill-eval` 的领域夹具、隐藏判据、runner 和原始结果仅在维护者本地被 Git 忽略的 `.scratch/skill-eval/`，不随公开仓分发。本地缺少套件时无法执行评测，须报告 `unverified`。
 
 **Suggested flow (optional composition):** `domain-model-c` → `deep-modules-c` → `improve-architecture-c` → `write-legible-embedded-c`. Each skill runs alone if only one is installed. Line-level over-engineering on diffs: upstream **`ponytail-review`** (not vendored here).
 
@@ -80,7 +83,7 @@ Reload Grok / new session after install.
 ```bash
 personal_skills_root="$(git rev-parse --show-toplevel)/skills/engineering"
 mkdir -p "$HOME/.agents/skills"
-for name in spawn systematic-debugging receiving-code-review tech-doc-style-chinese cli-for-agents; do
+for name in spawn systematic-debugging receiving-code-review tech-doc-style-chinese cli-for-agents skill-eval; do
   dst="$HOME/.agents/skills/$name"
   if [ -e "$dst" ] || [ -L "$dst" ]; then
     printf '跳过已有入口，请检查目标：%s\n' "$dst"
